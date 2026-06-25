@@ -318,16 +318,85 @@ export default function Dashboard() {
       </header>
 
       <div className="p-6 space-y-6 max-w-screen-2xl mx-auto">
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">
-            Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-0.5">Glad to have you back!</p>
+
+        {/* Error Banner */}
+        {statsError && (
+          <div className="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl text-sm">
+            Error loading statistics: {statsError}
+          </div>
+        )}
+
+        {/* ΓöÇΓöÇ Row 0: Quick Stats Summary ΓöÇΓöÇ */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            {
+              icon: Building2, label: "Total Companies", value: stats?.totalCompanies ?? "ΓÇö",
+              iconBg: "bg-blue-50", iconColor: "text-[#2563EB]", sub: "Extracted businesses",
+            },
+            {
+              icon: Briefcase, label: "Total Jobs", value: stats?.totalJobs ?? "ΓÇö",
+              iconBg: "bg-indigo-50", iconColor: "text-indigo-600", sub: "Jobs submitted",
+            },
+            {
+              icon: CheckCircle2, label: "Successful Jobs", value: stats?.successJobs ?? "ΓÇö",
+              iconBg: "bg-emerald-50", iconColor: "text-emerald-600", sub: "Completed successfully",
+            },
+            {
+              icon: XCircle, label: "Failed Jobs", value: stats?.failedJobs ?? "ΓÇö",
+              iconBg: "bg-rose-50", iconColor: "text-rose-600", sub: "Failed or crashed",
+            },
+          ].map(({ icon: Icon, label, value, iconBg, iconColor, sub }) => (
+            <div
+              key={label}
+              className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow group cursor-default"
+            >
+              <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                <Icon className={`w-6 h-6 ${iconColor}`} />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">{label}</p>
+                {statsLoading ? (
+                  <div className="h-7 w-12 bg-slate-100 rounded animate-pulse mt-1" />
+                ) : (
+                  <p className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                    {typeof value === "number" ? value.toLocaleString() : value}
+                  </p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-0.5">{sub}</p>
+              </div>
+            </div>
+          ))}
         </div>
-      </header>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            {
+              icon: Building2, label: "Total Companies", value: stats?.totalCompanies ?? "—",
+              iconBg: "bg-blue-50", iconColor: "text-[#2563EB]", sub: "Extracted businesses",
+            },
+            {
+              icon: Briefcase, label: "Total Jobs", value: stats?.totalJobs ?? "—",
+              iconBg: "bg-indigo-50", iconColor: "text-indigo-600", sub: "Jobs submitted",
+            },
+            {
+              icon: CheckCircle2, label: "Successful Jobs", value: stats?.successJobs ?? "—",
+              iconBg: "bg-emerald-50", iconColor: "text-emerald-600", sub: "Completed successfully",
+            },
+            {
+              icon: XCircle, label: "Failed Jobs", value: stats?.failedJobs ?? "—",
+              iconBg: "bg-rose-50", iconColor: "text-rose-600", sub: "Failed or crashed",
+            },
+          ].map(({ icon: Icon, label, value, iconBg, iconColor, sub }) => (
+            <div key={label} className="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
+              <div className="flex-shrink-0"><Icon /></div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold">{label}</p>
+                <p className="text-2xl font-extrabold">{value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
