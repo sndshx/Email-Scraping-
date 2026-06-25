@@ -120,9 +120,113 @@ export default function History() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
+  const StatusBadge = ({ status }: { status: "SUCCESS" | "FAILED" | "RUNNING" }) => {
+    const configs = {
+      SUCCESS: { cls: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Successful" },
+      FAILED: { cls: "bg-rose-50 text-rose-700 border-rose-200", label: "Failed" },
+      RUNNING: { cls: "bg-amber-50 text-amber-700 border-amber-200 animate-pulse", label: "Running" },
+    };
+    const c = configs[status] || { cls: "bg-slate-50 text-slate-700 border-slate-200", label: status };
+    return (
+      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${c.cls}`}>
+        {status === "RUNNING" && <PlayCircle className="w-3 h-3" />}
+        {c.label}
+      </span>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="p-6">History Page Loading...</div>
+      {/* Top Header Bar */}
+      <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">Scraping History</h1>
+          <p className="text-xs text-slate-400 mt-0.5">Complete list of all email scraping jobs.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* User profile avatar with dropdown */}
+          <div className="relative flex items-center" ref={profileRef}>
+            <button
+              onClick={() => setProfileOpen((p) => !p)}
+              className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200"
+            >
+              <span className="text-white text-sm font-extrabold leading-none select-none">S</span>
+            </button>
+
+            {/* Dropdown */}
+            {profileOpen && (
+              <div className="absolute right-0 top-12 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/60 overflow-hidden z-50">
+                {/* Profile info */}
+                <div className="px-4 py-3 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#2563EB] flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-xs font-extrabold leading-none select-none">S</span>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">ScrapeEngine</p>
+                      <p className="text-[10px] text-slate-400">Platform v1.0</p>
+                    </div>
+                  </div>
+                </div>
+                {/* Sign Out */}
+                <button
+                  onClick={() => {
+                    setProfileOpen(false);
+                    window.location.href = "/";
+                  }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <div className="p-6 space-y-6 max-w-screen-2xl mx-auto">
+        {/* Statistics Cards Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            {
+              icon: Briefcase,
+              label: "Total Jobs",
+              value: stats?.totalJobs ?? "ΓÇö",
+              iconBg: "bg-indigo-50",
+              iconColor: "text-indigo-600",
+              sub: "Submitted keyword scans",
+            },
+            {
+              icon: CheckCircle2,
+              label: "Successful Jobs",
+              value: stats?.successJobs ?? "ΓÇö",
+              iconBg: "bg-emerald-50",
+              iconColor: "text-emerald-600",
+              sub: "Completed successfully",
+            },
+            {
+              icon: XCircle,
+              label: "Failed Jobs",
+              value: stats?.failedJobs ?? "ΓÇö",
+              iconBg: "bg-rose-50",
+              iconColor: "text-rose-600",
+              sub: "Unsuccessful runs",
+            },
+            {
+              icon: Building2,
+              label: "Total Extracted",
+              value: stats?.totalCompanies ?? "ΓÇö",
+              iconBg: "bg-blue-50",
+      </div>
     </div>
   );
 }
