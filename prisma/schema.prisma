@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Company {
+  id          Int       @id @default(autoincrement())
+  name        String
+  website     String?
+  email       String?
+  location    String?
+  industry    String?
+  companySize String?
+  foundedYear String?
+  revenue     String?
+  source      String?
+  scrapeJobId Int
+  scrapeJob   ScrapeJob @relation(fields: [scrapeJobId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model ScrapeJob {
+  id         Int       @id @default(autoincrement())
+  query      String
+  status     String
+  totalFound Int       @default(0)
+  createdAt  DateTime  @default(now())
+  companies  Company[]
+}

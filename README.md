@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # EMAIL-MARKETING-AI-AGENT
 
 This repository contains the Email Marketing AI Agent project.
@@ -7,3 +8,7 @@ This repository contains the Email Marketing AI Agent project.
 - Aakriti
 - Angely
 - Panas
+=======
+
+git push origin Anjali
+>>>>>>> Panas
