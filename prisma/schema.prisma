@@ -3,8 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
 }
 
 model User {
@@ -13,4 +12,24 @@ model User {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+}
+
+model Company {
+  id          Int       @id @default(autoincrement())
+  name        String
+  website     String?
+  email       String?
+  location    String?
+  scrapeJobId Int
+  scrapeJob   ScrapeJob @relation(fields: [scrapeJobId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model ScrapeJob {
+  id         Int       @id @default(autoincrement())
+  query      String
+  status     String
+  totalFound Int       @default(0)
+  createdAt  DateTime  @default(now())
+  companies  Company[]
 }
