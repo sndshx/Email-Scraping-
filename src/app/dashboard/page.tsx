@@ -368,34 +368,223 @@ export default function Dashboard() {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            {
-              icon: Building2, label: "Total Companies", value: stats?.totalCompanies ?? "—",
-              iconBg: "bg-blue-50", iconColor: "text-[#2563EB]", sub: "Extracted businesses",
-            },
-            {
-              icon: Briefcase, label: "Total Jobs", value: stats?.totalJobs ?? "—",
-              iconBg: "bg-indigo-50", iconColor: "text-indigo-600", sub: "Jobs submitted",
-            },
-            {
-              icon: CheckCircle2, label: "Successful Jobs", value: stats?.successJobs ?? "—",
-              iconBg: "bg-emerald-50", iconColor: "text-emerald-600", sub: "Completed successfully",
-            },
-            {
-              icon: XCircle, label: "Failed Jobs", value: stats?.failedJobs ?? "—",
-              iconBg: "bg-rose-50", iconColor: "text-rose-600", sub: "Failed or crashed",
-            },
-          ].map(({ icon: Icon, label, value, iconBg, iconColor, sub }) => (
-            <div key={label} className="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
-              <div className="flex-shrink-0"><Icon /></div>
+        {/* ΓöÇΓöÇ Row 1: 3 stat cards ΓöÇΓöÇ */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+          {/* Card: Total Campaigns */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-500">Total Campaigns</p>
+              <button className="p-1 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                <MoreHorizontal className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <div className="flex items-end justify-between">
               <div>
-                <p className="text-xs text-slate-500 font-semibold">{label}</p>
-                <p className="text-2xl font-extrabold">{value}</p>
+                {statsLoading ? (
+                  <div className="h-9 w-16 bg-slate-100 rounded animate-pulse" />
+                ) : (
+                  <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                    {totalCampaigns}
+                  </h2>
+                )}
+                <p className="flex items-center gap-1 text-xs text-emerald-600 font-semibold mt-1">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  +3 Increased vs last week
+                </p>
+              </div>
+              <div className="w-32">
+                <Sparkline color="#2563EB" uptrend={true} />
               </div>
             </div>
-          ))}
+            <div className="flex justify-between text-[10px] text-slate-400">
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d, i) => (
+                <span key={i}>{d}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Card: Emails Sent */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-500">Emails Sent</p>
+              <button className="p-1 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                <MoreHorizontal className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <div>
+              {statsLoading ? (
+                <div className="h-9 w-20 bg-slate-100 rounded animate-pulse" />
+              ) : (
+                <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                  {emailsSent.toLocaleString()}
+                </h2>
+              )}
+              <p className="flex items-center gap-1 text-xs text-emerald-600 font-semibold mt-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                +12% Increased vs last week
+              </p>
+            </div>
+            <BarChart activeIndex={2} />
+          </div>
+
+          {/* Card: Engagement Insights */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-500">Engagement Insights</p>
+              <button className="p-1 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                <MoreHorizontal className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { icon: Smartphone, label: "Mobile", pct: "72%", w: "72%" },
+                { icon: Monitor, label: "Desktop", pct: "20%", w: "20%" },
+                { icon: Tablet, label: "Tablet", pct: "8%", w: "8%" },
+              ].map(({ icon: Icon, label, pct, w }) => (
+                <div key={label} className="flex flex-col items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-500">{label}</span>
+                  <span className="text-xl font-extrabold text-slate-900">{pct}</span>
+                  <div className="w-full h-16 bg-blue-50 rounded-lg overflow-hidden flex items-end">
+                    <div
+                      className="w-full bg-gradient-to-t from-[#2563EB] to-blue-300 rounded-lg"
+                      style={{ height: w }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+
+        {/* ΓöÇΓöÇ Row 2: Campaign Performance + Open Rate ΓöÇΓöÇ */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+          {/* Campaign Performance ΓÇö 2/3 width */}
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-800">Campaign Performance</h3>
+              <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                <BarChart3 className="w-3.5 h-3.5" />
+                Jan 2024 - Dec 2024
+              </div>
+            </div>
+            {/* SVG Line Chart */}
+            {(() => {
+              const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+              const values = [14200, 17800, 19500, 15800, 26446, 18200, 21000, 23500, 17200, 22100, 19800, 21500];
+              const W = 540, H = 160, padL = 44, padR = 16, padT = 28, padB = 24;
+              const minV = 10000, maxV = 30000;
+              const toX = (i: number) => padL + (i / (months.length - 1)) * (W - padL - padR);
+              const toY = (v: number) => padT + (1 - (v - minV) / (maxV - minV)) * (H - padT - padB);
+              const peakIdx = values.indexOf(Math.max(...values));
+              const points = values.map((v, i) => `${toX(i)},${toY(v)}`).join(" ");
+              const areaPoints = `${toX(0)},${H - padB} ${points} ${toX(months.length - 1)},${H - padB}`;
+              const yLabels = ["$30K","$25K","$20K","$15K","$10K"];
+              const yVals   = [30000, 25000, 20000, 15000, 10000];
+              return (
+                <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 200 }}>
+                  <defs>
+                    <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"   stopColor="#2563EB" stopOpacity="0.18" />
+                      <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Grid lines */}
+                  {yVals.map((v, i) => (
+                    <g key={i}>
+                      <line
+                        x1={padL} y1={toY(v)} x2={W - padR} y2={toY(v)}
+                        stroke="#f1f5f9" strokeWidth="1"
+                      />
+                      <text x={padL - 6} y={toY(v) + 4} textAnchor="end"
+                        fontSize="9" fill="#94a3b8">{yLabels[i]}</text>
+                    </g>
+                  ))}
+
+                  {/* Filled area */}
+                  <polygon points={areaPoints} fill="url(#lineGrad)" />
+
+                  {/* Line */}
+                  <polyline
+                    points={points}
+                    fill="none"
+                    stroke="#2563EB"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* Data points */}
+                  {values.map((v, i) => (
+                    <circle
+                      key={i}
+                      cx={toX(i)} cy={toY(v)} r={i === peakIdx ? 5 : 3}
+                      fill={i === peakIdx ? "#2563EB" : "#fff"}
+                      stroke="#2563EB"
+                      strokeWidth={i === peakIdx ? 0 : 2}
+                    />
+                  ))}
+
+                  {/* Peak tooltip */}
+                  <g>
+                    <rect
+                      x={toX(peakIdx) - 28} y={toY(values[peakIdx]) - 22}
+                      width={56} height={17} rx={5}
+                      fill="#2563EB"
+                    />
+                    <text
+                      x={toX(peakIdx)} y={toY(values[peakIdx]) - 10}
+                      textAnchor="middle" fontSize="9" fontWeight="700" fill="#fff"
+                    >
+                      $26,446
+                    </text>
+                  </g>
+
+                  {/* X-axis labels */}
+                  {months.map((m, i) => (
+                    <text
+                      key={m}
+                      x={toX(i)} y={H - padB + 14}
+                      textAnchor="middle" fontSize="9" fill="#94a3b8"
+                    >{m}</text>
+                  ))}
+                </svg>
+              );
+            })()}
+          </div>
+
+          {/* Email Reply and Open Rate ΓÇö 1/3 */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-bold text-slate-800">Email Reply and Open Rate</h3>
+              <button className="p-1 rounded-lg hover:bg-slate-50 cursor-pointer">
+                <MoreHorizontal className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <div className="flex justify-center mt-2 mb-4">
+              <GaugeChart />
+            </div>
+            <div className="space-y-2">
+              {[
+                { label: "Open Rate", pct: `${openRate}%`, color: "#2563EB" },
+                { label: "Reply Rate", pct: `${replyRate}%`, color: "#93c5fd" },
+                { label: "Click-Through Rate", pct: `${ctrRate}%`, color: "#cbd5e1" },
+              ].map(({ label, pct, color }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                    style={{ background: color }}
+                  />
+                  <span className="text-xs text-slate-600 flex-1">{label}</span>
+                  <span className="text-xs font-bold text-slate-800">{pct}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
