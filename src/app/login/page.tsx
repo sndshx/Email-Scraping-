@@ -8,10 +8,31 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function handleLogin(e: React.FormEvent) {
+async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    setTimeout(() => setLoading(false), 2000)
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        alert(data.error || 'Login failed')
+        return
+      }
+
+      window.location.href = '/dashboard'
+
+    } catch {
+      alert('Something went wrong')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
