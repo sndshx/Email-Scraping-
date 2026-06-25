@@ -20,6 +20,11 @@ model Company {
   website     String?
   email       String?
   location    String?
+  industry    String?
+  companySize String?
+  foundedYear String?
+  revenue     String?
+  source      String?
   scrapeJobId Int
   scrapeJob   ScrapeJob @relation(fields: [scrapeJobId], references: [id])
   createdAt   DateTime  @default(now())
