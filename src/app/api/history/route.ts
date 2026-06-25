@@ -23,7 +23,17 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    return NextResponse.json({ page, limit, skip, where });
+    const [totalItems, jobs] = await Promise.all([
+      prisma.scrapeJob.count({ where }),
+      prisma.scrapeJob.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    return NextResponse.json({ totalItems, jobs });
   } catch (error: any) {
     console.error("History API Error:", error);
     return NextResponse.json(
