@@ -10,15 +10,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
-  LayoutDashboard,
-  ScanSearch,
-  Table2,
-  History,
-  LogOut,
   MoreHorizontal,
   Building2,
+  Table2,
 } from "lucide-react";
-import Link from "next/link";
+import Sidebar from "@/app/component/sidebar";
 
 interface Company {
   id: string;
@@ -49,13 +45,6 @@ const SOURCE_COLORS: Record<string, string> = {
   Apollo: "bg-rose-50 text-rose-700 border-rose-200",
   Craigslist: "bg-slate-50 text-slate-700 border-slate-200",
 };
-
-const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Scraper", href: "/scrape", icon: ScanSearch },
-  { label: "Results", href: "/results", icon: Table2 },
-  { label: "History", href: "/history", icon: History },
-];
 
 export default function ResultsPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -168,53 +157,28 @@ export default function ResultsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 flex">
+      <Sidebar />
 
-      {/* Top Header - same as dashboard */}
-      <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">
-            Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-0.5">View and manage your scraped results.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
-            <span className="text-white text-sm font-extrabold leading-none select-none">S</span>
+      {/* Everything inside flex-1 */}
+      <div className="flex-1 overflow-auto flex flex-col">
+
+        {/* Top Header */}
+        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">
+              Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5">View and manage your scraped results.</p>
           </div>
-        </div>
-      </header>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
+              <span className="text-white text-sm font-extrabold leading-none select-none">S</span>
+            </div>
+          </div>
+        </header>
 
-      <div className="flex">
-        {/* Sidebar - exact same as dashboard */}
-        <aside className="w-56 min-h-screen bg-white border-r border-slate-200 flex flex-col py-6 px-4 sticky top-[57px] h-[calc(100vh-57px)]">
-          <nav className="flex flex-col gap-1 flex-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  item.href === "/results"
-                    ? "bg-blue-50 text-[#2563EB] font-semibold"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <button
-            onClick={() => { window.location.href = "/"; }}
-            className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-          <p className="text-xs text-slate-300 px-1 mt-3">Scraping Platform v1.0</p>
-        </aside>
-
-        {/* Main Content */}
+        {/* Page Content */}
         <main className="flex-1 p-6 space-y-5">
 
           {/* Page Header */}
@@ -305,8 +269,6 @@ export default function ResultsPage() {
 
           {/* Table */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-
-            {/* Table Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-[#2563EB]" />
@@ -402,7 +364,6 @@ export default function ResultsPage() {
                   </table>
                 </div>
 
-                {/* Pagination */}
                 {pagination && pagination.totalPages > 1 && (
                   <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/50">
                     <span className="text-xs text-slate-500">

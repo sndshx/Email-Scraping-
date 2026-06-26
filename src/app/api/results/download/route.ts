@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -8,7 +7,16 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    const headers = ["Name", "Email", "Website", "Location", "Industry", "Size", "Source", "Date Scraped"];
+    const headers = [
+      "Name",
+      "Email",
+      "Website",
+      "Location",
+      "Industry",
+      "Size",
+      "Source",
+      "Date Scraped",
+    ];
     const rows = companies.map((c) => [
       c.name,
       c.email || "",
@@ -21,7 +29,9 @@ export async function GET() {
     ]);
 
     const csv = [headers, ...rows]
-      .map((row) => row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(","))
+      .map((row) =>
+        row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(","),
+      )
       .join("\n");
 
     return new NextResponse(csv, {
