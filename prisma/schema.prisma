@@ -38,3 +38,11 @@ model ScrapeJob {
   createdAt  DateTime  @default(now())
   companies  Company[]
 }
+model WhatsAppMessage {
+  id              Int      @id @default(autoincrement())
+  from            String
+  customerMessage String
+  aiReply         String
+  status          String   @default("SUCCESS")
+  createdAt       DateTime @default(now())
+}
