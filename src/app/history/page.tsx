@@ -133,7 +133,7 @@ export default function History() {
       <div className="flex-1 overflow-auto flex flex-col">
 
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-slate-900">Scraping History</h1>
             <p className="text-xs text-slate-400 mt-0.5">Complete list of all email scraping jobs.</p>
@@ -173,7 +173,7 @@ export default function History() {
         </header>
 
         {/* Page Content */}
-        <div className="p-6 space-y-6 max-w-screen-2xl mx-auto w-full">
+        <div className="p-4 md:p-6 space-y-6 max-w-screen-2xl mx-auto w-full">
 
           {/* Statistics Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
