@@ -164,7 +164,7 @@ export default function ResultsPage() {
       <div className="flex-1 overflow-auto flex flex-col">
 
         {/* Top Header */}
-        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-slate-900">
               Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
@@ -179,17 +179,17 @@ export default function ResultsPage() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6 space-y-5">
+        <main className="flex-1 p-4 md:p-6 space-y-5">
 
           {/* Page Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Results</h2>
               <p className="text-slate-400 text-sm mt-0.5">
                 {pagination ? `${pagination.totalItems.toLocaleString()} companies found` : "Loading..."}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {selectedIds.length > 0 && (
                 <button
                   onClick={handleDeleteSelected}

@@ -22,7 +22,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-56 min-h-screen bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen">
+    <aside className="hidden md:flex w-56 min-h-screen bg-white border-r border-slate-200 flex-col sticky top-0 h-screen">
       {/* Logo */}
       <div className="flex items-center gap-3 h-16 px-5 border-b border-slate-100">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
