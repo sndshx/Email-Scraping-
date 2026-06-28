@@ -88,7 +88,7 @@ export default function ScrapePage() {
 
       <div className="flex-1 overflow-auto flex flex-col">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-slate-900">
               Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>

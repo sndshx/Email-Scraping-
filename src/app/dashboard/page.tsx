@@ -33,9 +33,9 @@ function BarChart() {
   const bars = [25, 30, 25, 30, 35, 80, 95];
   const days = ["M","T","W","T","F","S","S"];
   return (
-    <div className="flex items-end gap-2 w-full flex-1">
+    <div className="flex items-end gap-2 w-full h-24">
       {bars.map((h, i) => (
-        <div key={i} className="flex flex-col items-center gap-1 flex-1 justify-end" style={{ height: "100%" }}>
+        <div key={i} className="flex flex-col items-center gap-1 flex-1 justify-end h-full">
           <div className="w-full rounded-md transition-all"
             style={{ height: `${h}%`, background: i >= 5 ? "#2563EB" : "#dbeafe" }} />
           <span className="text-[10px] text-slate-400">{days[i]}</span>
@@ -52,7 +52,7 @@ function DonutChart({ success, failed, running, total }: { success: number; fail
   const rp = total > 0 ? running / total : 0;
   const g  = total > 0 ? 0.012 : 0;
   return (
-    <svg width="120" height="120" viewBox="0 0 120 120">
+    <svg width="120" height="120" viewBox="0 0 120 120" className="flex-shrink-0">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth="14" />
       {total === 0
         ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e2e8f0" strokeWidth="14" />
@@ -108,26 +108,28 @@ export default function Dashboard() {
   const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
 
   return (
-    <div className="h-screen bg-[#f0f4f8] flex overflow-hidden">
+    <div className="min-h-screen bg-[#f0f4f8] flex">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0">
 
-        {/* ── Header ── */}
-        <header className="flex-shrink-0 bg-[#f0f4f8] px-6 py-4 flex items-center justify-between">
+        {/* Header */}
+        <header className="sticky top-0 z-20 bg-[#f0f4f8] px-4 md:px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
+            <h1 className="text-lg md:text-xl font-bold text-slate-900">
               Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">Here&apos;s what&apos;s happening with your campaigns today.</p>
+            <p className="text-xs text-slate-500 mt-0.5 hidden sm:block">Here&apos;s what&apos;s happening with your campaigns today.</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <button onClick={fetchStats}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition cursor-pointer shadow-sm">
-              <RefreshCw className="w-3.5 h-3.5" /> Refresh
+              className="flex items-center gap-1.5 px-2 md:px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition cursor-pointer shadow-sm">
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Refresh</span>
             </button>
             <Link href="/scrape"
-              className="flex items-center gap-2 px-4 py-2 bg-[#2563EB] text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition cursor-pointer shadow-sm">
-              <Zap className="w-3.5 h-3.5" /> New Campaign
+              className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-[#2563EB] text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition cursor-pointer shadow-sm">
+              <Zap className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">New Campaign</span>
             </Link>
             <div className="relative" ref={profileRef}>
               <button onClick={() => setProfileOpen(p => !p)}
@@ -150,15 +152,15 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* ── Main content fills remaining height ── */}
-        <div className="flex-1 px-6 pb-5 flex flex-col gap-4 min-h-0">
+        {/* Main content */}
+        <div className="flex-1 px-4 md:px-6 pb-6 flex flex-col gap-4">
 
           {statsError && (
-            <div className="flex-shrink-0 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs">⚠ {statsError}</div>
+            <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 rounded-xl text-xs">⚠ {statsError}</div>
           )}
 
-          {/* Row 1: 3 stat cards — equal height */}
-          <div className="grid grid-cols-3 gap-4 flex-shrink-0">
+          {/* Row 1: stat cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { icon: Building2,    label: "Total companies", sub: "Extracted businesses",    val: companies, color: "#2563EB", bg: "bg-blue-50",    id: "sg1" },
               { icon: Briefcase,    label: "Total jobs",      sub: "Campaigns submitted",     val: total,     color: "#6366f1", bg: "bg-indigo-50",  id: "sg2" },
@@ -186,8 +188,8 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Row 2: Donut + Bar + Quick Actions — fills remaining space */}
-          <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+          {/* Row 2: Donut + Bar + Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
             {/* Job success rate */}
             <div className="bg-white rounded-2xl px-5 py-4 shadow-sm flex flex-col gap-3 hover:shadow-md transition-shadow">
@@ -195,7 +197,7 @@ export default function Dashboard() {
                 <h3 className="text-sm font-bold text-slate-800">Job success rate</h3>
                 <span className="text-[11px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-semibold">All time</span>
               </div>
-              <div className="flex items-center gap-4 flex-1">
+              <div className="flex items-center gap-4">
                 <DonutChart success={success} failed={failed} running={running} total={total} />
                 <div className="space-y-3 flex-1">
                   {[
@@ -230,22 +232,20 @@ export default function Dashboard() {
               <p className="flex items-center gap-1 text-xs text-emerald-600 font-semibold">
                 <TrendingUp className="w-3 h-3" />+18% vs last week
               </p>
-              <div className="flex-1 min-h-0" style={{ height: "100px" }}>
-                <BarChart />
-              </div>
+              <BarChart />
             </div>
 
             {/* Quick actions */}
-            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm flex flex-col gap-3 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl px-5 py-4 shadow-sm flex flex-col gap-3 hover:shadow-md transition-shadow md:col-span-2 lg:col-span-1">
               <h3 className="text-sm font-bold text-slate-800">Quick actions</h3>
-              <div className="flex flex-col gap-2 flex-1">
+              <div className="flex flex-col gap-2">
                 {[
                   { href:"/scrape",  icon:Zap,       label:"New scrape campaign", sub:"Launch a new scraping job"   },
                   { href:"/results", icon:Building2,  label:"Browse results",      sub:"View extracted companies"   },
                   { href:"/history", icon:Clock,      label:"Scrape history",      sub:"All past jobs & statuses"   },
                 ].map(({ href, icon: Icon, label, sub }) => (
                   <Link key={href} href={href}
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition group cursor-pointer flex-1">
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition group cursor-pointer">
                     <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-5 h-5 text-[#2563EB]" />
                     </div>
