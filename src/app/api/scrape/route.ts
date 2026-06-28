@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
 
     const job = await prisma.scrapeJob.create({
       data: {
-        query: keyword,
-        status: "running",
+        keyword: keyword,
+        status: "RUNNING",
       },
     });
 
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.scrapeJob.update({
       where: { id: job.id },
-      data: { status: "completed", totalFound: companiesData.length },
+      data: { status: "SUCCESS", resultsCount: companiesData.length },
     });
 
     return NextResponse.json({ count: companiesData.length });

@@ -108,16 +108,18 @@ export default function History() {
     });
   };
 
-  const StatusBadge = ({ status }: { status: "SUCCESS" | "FAILED" | "RUNNING" }) => {
-    const configs = {
-      SUCCESS: { cls: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Successful" },
-      FAILED: { cls: "bg-rose-50 text-rose-700 border-rose-200", label: "Failed" },
-      RUNNING: { cls: "bg-amber-50 text-amber-700 border-amber-200 animate-pulse", label: "Running" },
+  const StatusBadge = ({ status }: { status: string }) => {
+    const upper = status?.toUpperCase();
+    const configs: Record<string, { cls: string; label: string }> = {
+      SUCCESS:   { cls: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Successful" },
+      COMPLETED: { cls: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Successful" },
+      FAILED:    { cls: "bg-rose-50 text-rose-700 border-rose-200",          label: "Failed"     },
+      RUNNING:   { cls: "bg-amber-50 text-amber-700 border-amber-200 animate-pulse", label: "Running" },
     };
-    const c = configs[status] || { cls: "bg-slate-50 text-slate-700 border-slate-200", label: status };
+    const c = configs[upper] || { cls: "bg-slate-50 text-slate-700 border-slate-200", label: status };
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${c.cls}`}>
-        {status === "RUNNING" && <PlayCircle className="w-3 h-3" />}
+        {upper === "RUNNING" && <PlayCircle className="w-3 h-3" />}
         {c.label}
       </span>
     );
