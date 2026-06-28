@@ -8,12 +8,14 @@ import {
   Table2,
   History,
   LogOut,
+  MessageSquare,
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Scraper", href: "/scrape", icon: ScanSearch },
   { label: "Results", href: "/results", icon: Table2 },
+  { label: "Messages", href: "/messages", icon: MessageSquare },
   { label: "History", href: "/history", icon: History },
 ];
 
@@ -22,31 +24,13 @@ export default function Sidebar() {
 
   return (
     <aside className="w-56 min-h-screen bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen">
-      {/* Logo / Brand */}
+      {/* Logo */}
       <div className="flex items-center gap-3 h-16 px-5 border-b border-slate-100">
-        {/* Blue filled envelope with white V-flap */}
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 28 28"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="flex-shrink-0"
-        >
-          {/* Envelope body */}
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
           <rect x="2" y="6" width="24" height="17" rx="2.5" fill="#2563EB" />
-          {/* Envelope flap V */}
-          <polyline
-            points="2,6 14,16 26,6"
-            stroke="white"
-            strokeWidth="1.8"
-            strokeLinejoin="round"
-            fill="none"
-          />
+          <polyline points="2,6 14,16 26,6" stroke="white" strokeWidth="1.8" strokeLinejoin="round" fill="none" />
         </svg>
-        <span className="text-[17px] font-bold tracking-tight text-[#2563EB]">
-          ScrapeEngine
-        </span>
+        <span className="text-[17px] font-bold tracking-tight text-[#2563EB]">ScrapeEngine</span>
       </div>
 
       {/* Nav Items */}
@@ -77,9 +61,7 @@ export default function Sidebar() {
       {/* Sign Out */}
       <div className="px-3 py-4 border-t border-slate-100">
         <button
-          onClick={() => {
-            window.location.href = "/";
-          }}
+          onClick={() => { window.location.href = "/"; }}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />

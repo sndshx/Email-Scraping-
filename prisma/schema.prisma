@@ -31,10 +31,18 @@ model Company {
 }
 
 model ScrapeJob {
-  id           Int       @id @default(autoincrement())
-  keyword      String
-  status       String    @default("RUNNING")
-  resultsCount Int       @default(0)
-  createdAt    DateTime  @default(now())
-  companies    Company[]
+  id         Int       @id @default(autoincrement())
+  query      String
+  status     String
+  totalFound Int       @default(0)
+  createdAt  DateTime  @default(now())
+  companies  Company[]
+}
+model WhatsAppMessage {
+  id              Int      @id @default(autoincrement())
+  from            String
+  customerMessage String
+  aiReply         String
+  status          String   @default("SUCCESS")
+  createdAt       DateTime @default(now())
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 
-const publicPages = ['/', '/login']
+const publicPages = ['/', '/login', '/api/whatsapp']
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
