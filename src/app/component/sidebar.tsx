@@ -15,7 +15,6 @@ const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Scraper", href: "/scrape", icon: ScanSearch },
   { label: "Results", href: "/results", icon: Table2 },
-  { label: "Messages", href: "/messages", icon: MessageSquare },
   { label: "History", href: "/history", icon: History },
 ];
 
