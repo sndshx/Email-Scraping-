@@ -1,93 +1,71 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useSignIn, useAuth } from '@clerk/nextjs'
+import { useSignUp } from '@clerk/nextjs'
 import type { OAuthStrategy } from '@clerk/types'
 import { useRouter } from 'next/navigation'
 
-export default function LoginPage() {
-  const { signIn, isLoaded } = useSignIn()
-  const { isSignedIn, isLoaded: authLoaded } = useAuth()
+export default function SignupPage() {
+  const { signUp, isLoaded } = useSignUp()
   const router = useRouter()
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // If the user already has an active session, skip straight to the dashboard
-  useEffect(() => {
-    if (authLoaded && isSignedIn) {
-      router.push('/dashboard')
-    }
-  }, [authLoaded, isSignedIn, router])
-
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
-    if (!isLoaded || !signIn) return
+    if (!isLoaded || !signUp) {
+      setError('Still loading, please wait...')
+      return
+    }
     setLoading(true)
     setError('')
 
     try {
-      const result = await signIn.create({
-        identifier: email,
+      await signUp.create({
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ')[1] || '',
+        emailAddress: email,
         password,
       })
 
-      if ('status' in result && result.status === 'complete') {
-        await signIn.reload()
-        router.push('/dashboard')
-      } else {
-        setError('Login incomplete, please try again')
-      }
+      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
+      router.push('/verify-email')
+
     } catch (err: any) {
-      const clerkError = err.errors?.[0]
-
-      if (clerkError?.code === 'session_exists') {
-        // Already logged in — just send them to the dashboard
-        router.push('/dashboard')
-        return
-      }
-
-      if (clerkError?.code === 'form_password_incorrect' || clerkError?.code === 'strategy_for_user_invalid') {
-        setError('This email is linked to a Google/Apple account. Please use "Continue with Google" or "Continue with Apple" to sign in.')
-      } else {
-        setError(clerkError?.message || err.message || 'Login failed')
-      }
+      setError(err.errors?.[0]?.longMessage || err.errors?.[0]?.message || 'Signup failed')
     } finally {
       setLoading(false)
     }
   }
 
   async function handleGoogle() {
-    if (!isLoaded || !signIn) return
+    if (!isLoaded || !signUp) return
     try {
-      await signIn.authenticateWithRedirect({
+      await signUp.authenticateWithRedirect({
         strategy: 'oauth_google' as OAuthStrategy,
         redirectUrl: '/login/sso-callback',
         redirectUrlComplete: '/dashboard',
       })
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || 'Google login failed')
+      setError(err.errors?.[0]?.message || 'Google signup failed')
     }
   }
 
   async function handleApple() {
-    if (!isLoaded || !signIn) return
+    if (!isLoaded || !signUp) return
     try {
-      await signIn.authenticateWithRedirect({
+      await signUp.authenticateWithRedirect({
         strategy: 'oauth_apple' as OAuthStrategy,
         redirectUrl: '/login/sso-callback',
         redirectUrlComplete: '/dashboard',
       })
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || 'Apple login failed')
+      setError(err.errors?.[0]?.message || 'Apple signup failed')
     }
-  }
-
-  // Avoid flashing the login form while we check session state
-  if (!authLoaded || isSignedIn) {
-    return null
   }
 
   return (
@@ -96,8 +74,8 @@ export default function LoginPage() {
         <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-lg">
 
           <div className="text-center mb-8">
-            <h1 className="text-slate-900 text-2xl font-black mb-1">Welcome Back</h1>
-            <p className="text-slate-400 text-sm">login to access your dashboard</p>
+            <h1 className="text-slate-900 text-2xl font-black mb-1">Create Account</h1>
+            <p className="text-slate-400 text-sm">Sign up to get started</p>
           </div>
 
           {error && (
@@ -106,7 +84,23 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Full Name"
+                required
+                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition"
+              />
+            </div>
+
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2">
                 <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +113,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 required
-                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition"
               />
             </div>
 
@@ -135,22 +129,16 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 required
-                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition"
               />
-              <Link
-                href="/forgot-password"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-blue-600 font-semibold hover:underline"
-              >
-                Forgot password?
-              </Link>
             </div>
 
             <button
               type="submit"
               disabled={loading || !isLoaded}
-              className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-3.5 rounded-xl transition text-sm cursor-pointer"
             >
-              {loading ? 'Logging in...' : 'Get Started'}
+              {!isLoaded ? 'Loading...' : loading ? 'Creating account...' : 'Create Account →'}
             </button>
           </form>
 
@@ -158,15 +146,15 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-4 my-6">
             <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-slate-400 text-xs font-semibold">Or sign in with</span>
+            <span className="text-slate-400 text-xs font-semibold">Or sign up with</span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleGoogle}
               disabled={!isLoaded}
-              className="flex items-center justify-center w-16 h-12 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -174,24 +162,24 @@ export default function LoginPage() {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
+              Google
             </button>
 
             <button
               onClick={handleApple}
               disabled={!isLoaded}
-              className="flex items-center justify-center w-16 h-12 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black">
+                <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-3.06 1.57-.12 0-.23-.02-.336-.05-.012-.105-.02-.22-.02-.347 0-1.14.55-2.34 1.27-3.16.9-1.04 2.39-1.5 3.27-1.5.075.13.052.27.052.41zm.5 4.55c-1.69 0-3.15.96-3.97.96-.86 0-2.16-.91-3.55-.89-1.83.03-3.5 1.06-4.43 2.71-1.9 3.3-.49 8.23 1.4 10.92.92 1.34 2.02 2.84 3.45 2.79 1.38-.05 1.92-.9 3.62-.9 1.69 0 2.18.9 3.62.88 1.49-.02 2.49-1.36 3.41-2.7 1.07-1.55 1.51-3.07 1.53-3.15-.03-.02-2.93-1.13-2.95-4.47-.02-2.8 2.29-4.14 2.4-4.21-1.31-1.93-3.34-2.13-4.05-2.18-.21-.02-.4-.04-.66-.04-.5 0-1.18.16-1.83.16z"/>
               </svg>
+              Apple
             </button>
           </div>
 
           <p className="text-center text-slate-400 text-sm mt-6">
-            Don't have an account?{' '}
-            <Link href="/signup" className="text-blue-600 font-bold hover:underline">
-              Sign up
-            </Link>
+            Already have an account?{' '}
+            <Link href="/login" className="text-blue-600 font-bold hover:underline">Login</Link>
           </p>
         </div>
 

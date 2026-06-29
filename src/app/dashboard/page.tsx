@@ -7,6 +7,7 @@ import {
   RefreshCw, TrendingUp, LogOut, Zap, ExternalLink, Clock,
 } from "lucide-react";
 import Sidebar from "@/app/component/sidebar";
+import { useClerk } from "@clerk/nextjs";
 
 interface DashboardData {
   totalCompanies: number; totalJobs: number;
@@ -74,6 +75,7 @@ function DonutChart({ success, failed, running, total }: { success: number; fail
 }
 
 export default function Dashboard() {
+  const { signOut } = useClerk();
   const [stats, setStats]               = useState<DashboardData | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [statsError, setStatsError]     = useState<string | null>(null);
@@ -106,6 +108,12 @@ export default function Dashboard() {
   const running     = Math.max(0, total - success - failed);
   const companies   = stats?.totalCompanies ?? 0;
   const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
+
+  async function handleSignOut() {
+    setProfileOpen(false);
+    await signOut();
+    window.location.href = "/";
+  }
 
   return (
     <div className="min-h-screen bg-[#f0f4f8] flex">
@@ -142,7 +150,7 @@ export default function Dashboard() {
                     <p className="text-xs font-bold text-slate-800">ScrapeEngine</p>
                     <p className="text-[10px] text-slate-400">Platform v1.0</p>
                   </div>
-                  <button onClick={() => { setProfileOpen(false); window.location.href = "/"; }}
+                  <button onClick={handleSignOut}
                     className="w-full flex items-center gap-2 px-4 py-3 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition cursor-pointer">
                     <LogOut className="w-4 h-4" /> Sign Out
                   </button>
