@@ -16,7 +16,7 @@ const PLANS = [
     description: "Humanize your everyday writing",
     buttonText: "Current Plan",
     buttonVariant: "outline" as const,
-    prices: { weekly: 0, monthly: 0, yearly: 0 },
+    prices: { monthly: 0, yearly: 0 },
     features: [
       "50 companies/month",
       "1 scraping job at a time",
@@ -31,30 +31,14 @@ const PLANS = [
     description: "More room for everyday writing",
     buttonText: "Upgrade to Starter",
     buttonVariant: "outline" as const,
-    prices: { weekly: 9, monthly: 29, yearly: 199 },
-    features: {
-      weekly: [
-        "200 companies/month",
-        "5 concurrent jobs",
-        "Advanced extraction",
-        "Unlimited CSV export",
-        "Email support"
-      ],
-      monthly: [
-        "500 companies/month",
-        "5 concurrent jobs",
-        "Advanced extraction",
-        "Unlimited CSV export",
-        "Email support"
-      ],
-      yearly: [
-        "500 companies/month",
-        "5 concurrent jobs",
-        "Advanced extraction",
-        "Unlimited CSV export",
-        "Email support"
-      ]
-    }
+    prices: { monthly: 29, yearly: 199 },
+    features: [
+      "500 companies/month",
+      "5 concurrent jobs",
+      "Advanced extraction",
+      "Unlimited CSV export",
+      "Email support"
+    ]
   },
   {
     id: "plus",
@@ -64,7 +48,7 @@ const PLANS = [
     buttonText: "Upgrade to Plus",
     buttonVariant: "primary" as const,
     popular: true,
-    prices: { weekly: 19, monthly: 59, yearly: 499 },
+    prices: { monthly: 59, yearly: 499 },
     features: [
       "Unlimited companies",
       "10 concurrent jobs",
@@ -77,7 +61,7 @@ const PLANS = [
   }
 ];
 
-type BillingType = "weekly" | "monthly" | "yearly";
+type BillingType = "monthly" | "yearly";
 
 export default function PricingPage() {
   const [billing, setBilling] = useState<BillingType>("monthly");
@@ -91,7 +75,6 @@ export default function PricingPage() {
   };
 
   const getPeriod = () => {
-    if (billing === "weekly") return "/week";
     if (billing === "monthly") return "/month";
     return "/year";
   };
@@ -103,12 +86,7 @@ export default function PricingPage() {
 
     setLoading(planId);
     try {
-      const priceId =
-        billing === "weekly"
-          ? WEEKLY_PRICE_ID
-          : billing === "monthly"
-          ? MONTHLY_PRICE_ID
-          : YEARLY_PRICE_ID;
+      const priceId = billing === "monthly" ? MONTHLY_PRICE_ID : YEARLY_PRICE_ID;
 
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -175,7 +153,7 @@ export default function PricingPage() {
 
             {/* Billing Toggle */}
             <div className="flex items-center justify-center gap-2">
-              {(["weekly", "monthly", "yearly"] as BillingType[]).map((b) => (
+              {(["monthly", "yearly"] as BillingType[]).map((b) => (
                 <button
                   key={b}
                   onClick={() => setBilling(b)}
@@ -185,7 +163,6 @@ export default function PricingPage() {
                       : "bg-white border border-slate-200 text-slate-600 hover:border-[#2563EB]"
                   }`}
                 >
-                  {b === "weekly" && "Weekly"}
                   {b === "monthly" && "Monthly"}
                   {b === "yearly" && "Yearly"}
                 </button>
@@ -197,9 +174,7 @@ export default function PricingPage() {
               {PLANS.map((plan) => {
                 const isLoading = loading === plan.id;
                 const price = getPrice(plan.id);
-                const features = Array.isArray(plan.features) 
-                  ? plan.features 
-                  : plan.features[billing];
+                const features = plan.features;
                 
                 return (
                   <div
