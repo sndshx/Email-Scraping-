@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { RefreshCw, LayoutDashboard, ScanSearch, Table2, History, LogOut, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface DashboardData {
@@ -136,6 +137,7 @@ function LineChart({ data }: { data: number[] }) {
 // ── Sidebar ────────────────────────────────────────────────────────────────
 function Sidebar() {
   const pathname = usePathname();
+  const { signOut } = useClerk();
   const navItems = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Scraper", href: "/scrape", icon: ScanSearch },
@@ -183,7 +185,7 @@ function Sidebar() {
 
       <div className="px-3 py-4 border-t border-slate-100">
         <button
-          onClick={() => { window.location.href = "/"; }}
+          onClick={() => signOut({ redirectUrl: "/" })}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
         >
           <LogOut className="w-4 h-4" />
@@ -225,6 +227,7 @@ function StatCard({
 
 // ── Main Dashboard ─────────────────────────────────────────────────────────
 export default function DashboardPage() {
+  const { signOut } = useClerk();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -379,7 +382,7 @@ export default function DashboardPage() {
                       Manage Subscription
                     </Link>
                     <button
-                      onClick={() => { window.location.href = "/"; }}
+                      onClick={() => signOut({ redirectUrl: "/" })}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
