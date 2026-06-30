@@ -89,15 +89,21 @@ export default function ScrapePage() {
       <div className="flex-1 overflow-auto flex flex-col">
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex items-center justify-between">
-
-          
-          <div>
-            <h1 className="text-xl font-bold text-slate-900">
-              Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
-            </h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Start a new scraping job below.
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="w-9 h-9 rounded-lg bg-[#2563EB] flex items-center justify-center flex-shrink-0 shadow-sm">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="6" width="18" height="12" rx="2" stroke="white" strokeWidth="2" fill="none" />
+                <path d="M3 8L12 13L21 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">
+                Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
+              </h1>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Start a new scraping job below.
+              </p>
+            </div>
           </div>
           <div className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
             <span className="text-white text-sm font-extrabold leading-none select-none">S</span>
@@ -243,4 +249,3 @@ export default function ScrapePage() {
     </div>
   );
 }
-
