@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Raleway, Geist } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs'
+import WhatsAppWidget from "./component/WhatsAppWidget";
 
 const raleway = Raleway({
   variable: "--font-raleway",
@@ -34,7 +35,10 @@ export default function RootLayout({
         lang="en"
         className={`${raleway.variable} ${geist.variable} h-full antialiased`}
       >
-        <body className="min-h-full flex flex-col font-raleway">{children}</body>
+        <body className="min-h-full flex flex-col font-raleway">
+          {children}
+          <WhatsAppWidget />
+        </body>
       </html>
     </ClerkProvider>
   );
