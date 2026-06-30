@@ -8,7 +8,7 @@ import {
   Table2,
   History,
   LogOut,
-  MessageSquare,
+  Zap,
 } from "lucide-react";
 
 const navItems = [
@@ -25,10 +25,12 @@ export default function Sidebar() {
     <aside className="hidden md:flex w-56 min-h-screen bg-white border-r border-slate-200 flex-col sticky top-0 h-screen">
       {/* Logo */}
       <div className="flex items-center gap-3 h-16 px-5 border-b border-slate-100">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
-          <rect x="2" y="6" width="24" height="17" rx="2.5" fill="#2563EB" />
-          <polyline points="2,6 14,16 26,6" stroke="white" strokeWidth="1.8" strokeLinejoin="round" fill="none" />
-        </svg>
+        <div className="w-9 h-9 rounded-lg bg-[#2563EB] flex items-center justify-center flex-shrink-0 shadow-sm">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="6" width="18" height="12" rx="2" stroke="white" strokeWidth="2" fill="none" />
+            <path d="M3 8L12 13L21 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
         <span className="text-[17px] font-bold tracking-tight text-[#2563EB]">ScrapeEngine</span>
       </div>
 
@@ -56,6 +58,17 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Upgrade to Pro */}
+      <div className="px-3 pb-2">
+        <Link
+          href="/pricing"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all"
+        >
+          <Zap className="w-4 h-4 flex-shrink-0" />
+          Upgrade to Pro
+        </Link>
+      </div>
 
       {/* Sign Out */}
       <div className="px-3 py-4 border-t border-slate-100">
