@@ -10,9 +10,10 @@ const YEARLY_PRICE_ID = "price_1TnYh85ZTEXUpREBy4zrsnzo";
 
 const PLANS = [
   {
-    id: "starter",
-    name: "Starter",
-    description: "Perfect for getting started",
+    id: "free",
+    name: "Free",
+    badge: "Current",
+    description: "Humanize your everyday writing",
     buttonText: "Current Plan",
     buttonVariant: "outline" as const,
     prices: { weekly: 0, monthly: 0, yearly: 0 },
@@ -24,35 +25,53 @@ const PLANS = [
     ]
   },
   {
-    id: "pro",
-    name: "Pro Plan",
-    description: "For serious scrapers",
-    buttonText: "Upgrade to Pro",
+    id: "starter",
+    name: "Starter",
+    badge: null,
+    description: "More room for everyday writing",
+    buttonText: "Upgrade to Starter",
+    buttonVariant: "outline" as const,
+    prices: { weekly: 9, monthly: 29, yearly: 199 },
+    features: {
+      weekly: [
+        "200 companies/month",
+        "5 concurrent jobs",
+        "Advanced extraction",
+        "Unlimited CSV export",
+        "Email support"
+      ],
+      monthly: [
+        "500 companies/month",
+        "5 concurrent jobs",
+        "Advanced extraction",
+        "Unlimited CSV export",
+        "Email support"
+      ],
+      yearly: [
+        "500 companies/month",
+        "5 concurrent jobs",
+        "Advanced extraction",
+        "Unlimited CSV export",
+        "Email support"
+      ]
+    }
+  },
+  {
+    id: "plus",
+    name: "Plus",
+    badge: "Most Popular",
+    description: "Best for regular creators",
+    buttonText: "Upgrade to Plus",
     buttonVariant: "primary" as const,
     popular: true,
-    prices: { weekly: 9, monthly: 29, yearly: 199 },
+    prices: { weekly: 19, monthly: 59, yearly: 499 },
     features: [
       "Unlimited companies",
       "10 concurrent jobs",
       "Advanced extraction",
       "Unlimited CSV export",
       "Priority support",
-      "All platforms"
-    ]
-  },
-  {
-    id: "team",
-    name: "Team Plan",
-    description: "For growing teams",
-    buttonText: "Contact Sales",
-    buttonVariant: "outline" as const,
-    prices: { weekly: 29, monthly: 99, yearly: 299 },
-    features: [
-      "Everything in Pro",
-      "Unlimited team members",
-      "Team billing",
-      "Role-based access",
-      "Analytics dashboard",
+      "All platforms",
       "API access"
     ]
   }
@@ -78,7 +97,7 @@ export default function PricingPage() {
   };
 
   const handleUpgrade = async (planId: string) => {
-    if (planId === "starter") {
+    if (planId === "free") {
       return;
     }
 
@@ -160,7 +179,7 @@ export default function PricingPage() {
                 <button
                   key={b}
                   onClick={() => setBilling(b)}
-                  className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                  className={`px-5 py-2 rounded-full text-sm font-semibold transition-all min-w-[100px] ${
                     billing === b
                       ? "bg-[#2563EB] text-white shadow-md"
                       : "bg-white border border-slate-200 text-slate-600 hover:border-[#2563EB]"
@@ -168,14 +187,7 @@ export default function PricingPage() {
                 >
                   {b === "weekly" && "Weekly"}
                   {b === "monthly" && "Monthly"}
-                  {b === "yearly" && (
-                    <span className="flex items-center gap-1.5">
-                      Yearly
-                      <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-bold">
-                        Save 17%
-                      </span>
-                    </span>
-                  )}
+                  {b === "yearly" && "Yearly"}
                 </button>
               ))}
             </div>
@@ -185,6 +197,9 @@ export default function PricingPage() {
               {PLANS.map((plan) => {
                 const isLoading = loading === plan.id;
                 const price = getPrice(plan.id);
+                const features = Array.isArray(plan.features) 
+                  ? plan.features 
+                  : plan.features[billing];
                 
                 return (
                   <div
@@ -195,11 +210,15 @@ export default function PricingPage() {
                         : "border-slate-200 shadow-sm hover:shadow-lg hover:border-slate-300"
                     }`}
                   >
-                    {/* Popular Badge */}
-                    {plan.popular && (
+                    {/* Badge */}
+                    {plan.badge && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <div className="bg-[#2563EB] text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
-                          MOST POPULAR
+                        <div className={`text-[10px] font-bold px-3 py-1 rounded-full shadow-lg ${
+                          plan.popular 
+                            ? "bg-slate-800 text-white"
+                            : "bg-slate-100 text-slate-600 border border-slate-200"
+                        }`}>
+                          {plan.badge}
                         </div>
                       </div>
                     )}
@@ -228,7 +247,7 @@ export default function PricingPage() {
                     {/* CTA Button */}
                     <button
                       onClick={() => handleUpgrade(plan.id)}
-                      disabled={isLoading || plan.id === "starter"}
+                      disabled={isLoading || plan.id === "free"}
                       className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 mb-6 ${
                         plan.buttonVariant === "primary"
                           ? "bg-[#2563EB] text-white hover:bg-blue-700 shadow-md shadow-blue-200"
@@ -240,7 +259,7 @@ export default function PricingPage() {
 
                     {/* Features */}
                     <ul className="space-y-3">
-                      {plan.features.map((feature, index) => (
+                      {features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-2.5">
                           <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
                             plan.popular ? "bg-[#2563EB]" : "bg-slate-900"
