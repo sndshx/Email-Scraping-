@@ -77,7 +77,7 @@ export default function LandingPage() {
 
             {/* Real Dashboard Preview */}
             <div className="pt-12">
-              <div className="max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden text-left">
+              <div className="max-w-7xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden text-left">
                 <div className="bg-slate-50 border-b border-slate-100 px-4 py-3 flex items-center gap-2">
                   <div className="flex gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-rose-300"></div>
@@ -91,56 +91,56 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="p-8">
+                  <div className="flex items-center justify-between mb-8 py-4">
                     <div>
-                      <p className="text-base font-black text-slate-900">Welcome back</p>
-                      <p className="text-xs text-slate-400">Here&apos;s what&apos;s happening with your campaigns today</p>
+                      <p className="text-xl font-black text-slate-900">Welcome back</p>
+                      <p className="text-sm text-slate-400 mt-1">Here&apos;s what&apos;s happening with your campaigns today</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-500 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-bold text-slate-500 border border-slate-200 px-4 py-2.5 rounded-lg flex items-center gap-1">
                         ↻ Refresh
                       </span>
-                      <span style={{ backgroundColor: '#3b82f6' }} className="text-white text-xs font-bold px-3 py-1.5 rounded-lg">+ New campaign</span>
+                      <span style={{ backgroundColor: '#3b82f6' }} className="text-white text-sm font-bold px-4 py-2.5 rounded-lg">+ New campaign</span>
                     </div>
                   </div>
 
                   {/* Top stats */}
-                  <div className="grid grid-cols-4 gap-3 mb-4">
+                  <div className="grid grid-cols-4 gap-4 mb-6">
                     {[
                       { label: 'Total Companies', value: '184', change: '+12%', color: '#3b82f6' },
                       { label: 'Emails Extracted', value: '50', change: '+18%', color: '#10b981' },
                       { label: 'Total Jobs', value: '23', change: '+12%', color: '#f59e0b' },
                       { label: 'Success Rate', value: '57%', change: 'Needs attention', color: '#f59e0b' },
                     ].map((stat) => (
-                      <div key={stat.label} style={{ borderLeftColor: stat.color }} className="bg-white border border-slate-100 border-l-4 rounded-xl p-3">
-                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wide mb-1">{stat.label}</p>
-                        <p className="text-xl font-black text-slate-900">{stat.value}</p>
-                        <p className="text-[10px] font-semibold mt-1" style={{ color: stat.color }}>→ {stat.change}</p>
+                      <div key={stat.label} style={{ borderLeftColor: stat.color }} className="bg-white border border-slate-100 border-l-4 rounded-xl p-6 min-h-[140px] flex flex-col justify-between">
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wide">{stat.label}</p>
+                        <p className="text-3xl font-black text-slate-900 my-3">{stat.value}</p>
+                        <p className="text-xs font-semibold" style={{ color: stat.color }}>→ {stat.change}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* Job success rate + emails extracted */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-white border border-slate-100 rounded-xl p-4">
-                      <p className="text-xs font-bold text-slate-700 mb-3">Job success rate</p>
-                      <div className="flex items-center gap-4">
-                        <div className="relative w-16 h-16 rounded-full flex-shrink-0" style={{ background: 'conic-gradient(#10b981 0% 57%, #f59e0b 57% 65%, #e2e8f0 65% 100%)' }}>
-                          <div className="absolute inset-2 bg-white rounded-full flex flex-col items-center justify-center">
-                            <span className="text-sm font-black">57%</span>
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-white border border-slate-100 rounded-xl p-6 min-h-[200px]">
+                      <p className="text-sm font-bold text-slate-700 mb-6">Job success rate</p>
+                      <div className="flex items-center gap-6">
+                        <div className="relative w-24 h-24 rounded-full flex-shrink-0" style={{ background: 'conic-gradient(#10b981 0% 57%, #f59e0b 57% 65%, #e2e8f0 65% 100%)' }}>
+                          <div className="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center">
+                            <span className="text-xl font-black">57%</span>
                           </div>
                         </div>
-                        <div className="text-[10px] space-y-1">
-                          <p className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Successful 13</p>
-                          <p className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Running 2</p>
-                          <p className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Failed 0</p>
+                        <div className="text-xs space-y-2">
+                          <p className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500"></span>Successful 13</p>
+                          <p className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-amber-400"></span>Running 2</p>
+                          <p className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-rose-400"></span>Failed 0</p>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-white border border-slate-100 rounded-xl p-4">
-                      <p className="text-xs font-bold text-slate-700 mb-3">Emails extracted</p>
-                      <div className="flex items-end gap-1.5 h-14">
+                    <div className="bg-white border border-slate-100 rounded-xl p-6 min-h-[200px]">
+                      <p className="text-sm font-bold text-slate-700 mb-6">Emails extracted</p>
+                      <div className="flex items-end gap-2 h-28">
                         {[0, 0, 0, 0, 80, 0, 0].map((h, i) => (
                           <div key={i} className="flex-1 rounded-t" style={{ height: `${h}%`, backgroundColor: h > 0 ? '#3b82f6' : '#e2e8f0' }} />
                         ))}
@@ -149,9 +149,9 @@ export default function LandingPage() {
                   </div>
 
                   {/* Line chart */}
-                  <div className="bg-white border border-slate-100 rounded-xl p-4">
-                    <p className="text-xs font-bold text-slate-700 mb-2">Emails extracted over time</p>
-                    <svg viewBox="0 0 300 70" className="w-full h-16">
+                  <div className="bg-white border border-slate-100 rounded-xl p-6 min-h-[180px]">
+                    <p className="text-sm font-bold text-slate-700 mb-4">Emails extracted over time</p>
+                    <svg viewBox="0 0 300 70" className="w-full h-24">
                       <polyline
                         points="0,68 40,68 80,68 120,68 160,20 200,12 240,12 280,8"
                         fill="none"
@@ -370,104 +370,161 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. Pricing - with working Monthly / Yearly toggle */}
-      <section id="pricing" className="py-24 bg-slate-50 border-t border-slate-100">
+      {/* 6. Pricing - Modern Clean Design */}
+      <section id="pricing" className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-3">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Simple, transparent pricing</h2>
-            <p className="text-slate-500 text-sm mt-2">Start free. Upgrade when you need more.</p>
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Simple, transparent pricing</h2>
+            <p className="text-slate-600 text-base">Start free. Upgrade when you need more.</p>
           </div>
 
-          <div className="flex justify-center mb-10">
-            <div className="bg-white border border-slate-200 rounded-full p-1 flex gap-1">
+          {/* Toggle */}
+          <div className="flex justify-center mb-12">
+            <div className="inline-flex rounded-full bg-white shadow-md border border-gray-200">
               <button
                 onClick={() => setBilling('monthly')}
-                style={billing === 'monthly' ? { backgroundColor: '#3b82f6' } : {}}
-                className={`text-sm font-bold px-5 py-2 rounded-full transition-colors ${
-                  billing === 'monthly' ? 'text-white' : 'text-slate-500 hover:bg-slate-50'
+                className={`px-8 py-3 rounded-full text-sm font-semibold transition-all ${
+                  billing === 'monthly' 
+                    ? 'bg-white text-slate-700' 
+                    : 'text-slate-500'
                 }`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setBilling('yearly')}
-                style={billing === 'yearly' ? { backgroundColor: '#3b82f6' } : {}}
-                className={`text-sm font-bold px-5 py-2 rounded-full transition-colors ${
-                  billing === 'yearly' ? 'text-white' : 'text-slate-500 hover:bg-slate-50'
+                className={`px-8 py-3 rounded-full text-sm font-semibold transition-all relative flex items-center gap-2 ${
+                  billing === 'yearly' 
+                    ? 'bg-blue-500 text-white shadow-md' 
+                    : 'text-slate-500'
                 }`}
               >
                 Yearly
-                <span className={billing === 'yearly' ? 'text-blue-100' : 'text-emerald-500'}> · save 20%</span>
+                {billing === 'yearly' && (
+                  <span className="bg-yellow-400 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full">
+                    Save 20%
+                  </span>
+                )}
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          {/* Pricing Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
 
-            {/* Free */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-7">
-              <h3 className="text-base font-black text-slate-900">Free</h3>
-              <p className="text-xs text-slate-400 mt-1 mb-4">Humanize your everyday writing</p>
-              <p className="text-3xl font-black text-slate-900 mb-5">Free</p>
-              <Link href="/signup" className="block text-center bg-slate-100 text-slate-400 font-bold py-3 rounded-xl mb-6 cursor-default">
+            {/* Free Plan */}
+            <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gray-100 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">
+                Current
+              </div>
+              
+              <div className="mb-6 pt-2">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Free</h3>
+                <p className="text-sm text-slate-400">Humanize your everyday writing</p>
+              </div>
+              
+              <div className="mb-6">
+                <p className="text-5xl font-bold text-slate-900">Free</p>
+              </div>
+
+              <Link 
+                href="/signup" 
+                className="block w-full text-center py-3.5 px-4 rounded-xl bg-green-50 text-green-600 font-semibold mb-8 border border-green-200"
+              >
                 Current Plan
               </Link>
-              <ul className="space-y-3">
-                {['50 companies/month', '1 scraping job at a time', 'Basic email extraction', 'CSV export (limited)'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
-                    <svg className="w-4 h-4 flex-shrink-0 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
+
+              <ul className="space-y-4">
+                {['50 emails/month', '1 scraping job at a time', 'Basic email extraction', 'CSV export (limited)'].map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-slate-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-sm text-slate-600">{feature}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Starter */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-7">
-              <h3 className="text-base font-black text-slate-900">Starter</h3>
-              <p className="text-xs text-slate-400 mt-1 mb-4">More room for everyday writing</p>
-              <p className="text-3xl font-black text-slate-900 mb-5">
-                ${prices.starter[billing]}
-                <span className="text-sm text-slate-400 font-semibold">/month</span>
-              </p>
-              <Link href="/login" className="block text-center bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl mb-6 transition">
-                Upgrade to Starter
+            {/* Starter Plan */}
+            <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
+              <div className="mb-6 pt-5">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Starter</h3>
+                <p className="text-sm text-slate-400">More room for everyday writing</p>
+              </div>
+              
+              <div className="mb-2">
+                <p className="text-5xl font-bold text-slate-900">
+                  ${billing === 'yearly' ? '199' : prices.starter[billing]}
+                  <span className="text-xl font-normal text-slate-400">/year</span>
+                </p>
+              </div>
+
+              {billing === 'yearly' && (
+                <p className="text-sm text-green-600 font-semibold mb-6">+ Save $148/year</p>
+              )}
+
+              <Link 
+                href="/login" 
+                className="block w-full text-center py-3.5 px-4 rounded-xl bg-white hover:bg-gray-50 text-slate-900 font-semibold mb-8 border border-gray-300 transition-colors"
+              >
+                Get Starter
               </Link>
-              <ul className="space-y-3">
-                {['500 companies/month', '5 concurrent jobs', 'Advanced extraction', 'Unlimited CSV export', 'Email support'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
-                    <svg className="w-4 h-4 flex-shrink-0 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
+
+              <ul className="space-y-4">
+                {['500 emails/month', '5 concurrent jobs', 'Advanced extraction', 'Unlimited CSV export', 'Email support'].map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-slate-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-sm text-slate-600">{feature}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Plus - Most Popular */}
-            <div style={{ borderColor: '#3b82f6' }} className="relative bg-white border-2 rounded-2xl p-7 shadow-xl scale-105">
-              <span style={{ backgroundColor: '#0f172a' }} className="absolute -top-3 right-7 text-white text-xs font-bold px-3 py-1 rounded-full">
-                Most Popular
-              </span>
-              <h3 className="text-base font-black text-slate-900">Plus</h3>
-              <p className="text-xs text-slate-400 mt-1 mb-4">Best for regular creators</p>
-              <p className="text-3xl font-black text-slate-900 mb-5">
-                ${prices.plus[billing]}
-                <span className="text-sm text-slate-400 font-semibold">/month</span>
-              </p>
-              <Link href="/login" style={{ backgroundColor: '#3b82f6' }} className="block text-center text-white font-bold py-3 rounded-xl mb-6 hover:opacity-90 transition">
-                Upgrade to Plus
+            {/* Plus Plan - Current */}
+            <div className="bg-white rounded-3xl p-8 border-2 border-blue-500 shadow-xl relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">
+                Current
+              </div>
+              
+              <div className="mb-6 pt-2">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Plus</h3>
+                <p className="text-sm text-slate-400">Best for regular creators</p>
+              </div>
+              
+              <div className="mb-2">
+                <p className="text-5xl font-bold text-slate-900">
+                  ${billing === 'yearly' ? '399' : prices.plus[billing]}
+                  <span className="text-xl font-normal text-slate-400">/year</span>
+                </p>
+              </div>
+
+              {billing === 'yearly' && (
+                <p className="text-sm text-green-600 font-semibold mb-6">+ Save $309/year</p>
+              )}
+
+              <Link 
+                href="/login" 
+                className="block w-full text-center py-3.5 px-4 rounded-xl bg-green-50 text-green-600 font-semibold mb-8 border border-green-200"
+              >
+                Current Plan
               </Link>
-              <ul className="space-y-3">
-                {['Unlimited companies', '10 concurrent jobs', 'Advanced extraction', 'Unlimited CSV export', 'Priority support', 'All platforms', 'API access'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
-                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#3b82f6' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
+
+              <ul className="space-y-4">
+                {['Unlimited emails', '10 concurrent jobs', 'Advanced extraction', 'Unlimited CSV export', 'Priority support', 'All platforms', 'API access'].map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-sm text-slate-600">{feature}</span>
                   </li>
                 ))}
               </ul>

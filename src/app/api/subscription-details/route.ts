@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       interval,
-      currentPeriodEnd: subscription.current_period_end,
+      currentPeriodEnd: (subscription as any).current_period_end ?? (subscription as any).currentPeriodEnd,
       status: subscription.status,
     });
   } catch (error) {

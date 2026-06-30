@@ -7,6 +7,8 @@ const isPublicRoute = createRouteMatcher([
   '/forgot-password(.*)',
   '/verify-email(.*)',
   '/api/whatsapp(.*)',
+  '/api/webhook(.*)',       // ✅ Stripe webhook must be public (no Clerk session)
+  '/api/subscription-details(.*)', // ✅ Called from success page with session_id
 ])
 
 export default clerkMiddleware(
@@ -15,7 +17,7 @@ export default clerkMiddleware(
       await auth.protect()
     }
   },
-  { debug: true }
+  { debug: false }  // ✅ Disabled debug logs
 )
 
 export const config = {

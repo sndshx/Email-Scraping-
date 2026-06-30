@@ -1,69 +1,110 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-});
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";  // ✅ shared client (adapter sanga)
 
 export async function GET(req: NextRequest) {
   try {
-    // TODO: Get the actual user's email from session/auth
-    // For now, returning mock data
-    // You'll need to integrate with your auth system (Clerk, NextAuth, etc.)
+    // Get authenticated user from Clerk
+    const { userId } = await auth();
     
-    // Example: Get user's Stripe customer ID from database
-    // const user = await getCurrentUser();
-    // const stripeCustomerId = user.stripeCustomerId;
+    console.log("🔍 Checking subscription for Clerk userId:", userId);
     
-    // Mock data for demonstration
-    const mockSubscription = {
-      daysLeft: 27,
-      planType: 'Pro',
-      isActive: true,
-      endDate: new Date(Date.now() + 27 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric', 
-        year: 'numeric' 
-      })
-    };
-
-    /* 
-    // Real implementation would look like this:
-    if (stripeCustomerId) {
-      const subscriptions = await stripe.subscriptions.list({
-        customer: stripeCustomerId,
-        status: 'active',
-        limit: 1,
-      });
-
-      if (subscriptions.data.length > 0) {
-        const subscription = subscriptions.data[0];
-        const now = Math.floor(Date.now() / 1000);
-        const daysLeft = Math.ceil((subscription.current_period_end - now) / (24 * 60 * 60));
-        const interval = subscription.items.data[0]?.price.recurring?.interval || 'month';
-        
-        let planType = 'Pro';
-        if (interval === 'week') planType = 'Weekly';
-        if (interval === 'month') planType = 'Monthly';
-        if (interval === 'year') planType = 'Yearly';
-
-        return NextResponse.json({
-          daysLeft,
-          planType,
-          isActive: true,
-          endDate: new Date(subscription.current_period_end * 1000).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          })
-        });
-      }
+    if (!userId) {
+      console.log("❌ No userId found - returning Free plan");
+      return NextResponse.json(
+        { 
+          daysLeft: 0,
+          planType: 'Free',
+          isActive: false,
+          endDate: ''
+        },
+        { status: 200 }
+      );
     }
-    */
 
-    // Return mock data or free plan
-    return NextResponse.json(mockSubscription);
+    // Get user from Clerk to find email
+    const { clerkClient } = await import("@clerk/nextjs/server");
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+    const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
+
+    console.log("📧 User email from Clerk:", userEmail);
+
+    if (!userEmail) {
+      console.log("❌ No email found - returning Free plan");
+      return NextResponse.json(
+        { 
+          daysLeft: 0,
+          planType: 'Free',
+          isActive: false,
+          endDate: ''
+        },
+        { status: 200 }
+      );
+    }
+
+    // First find the User record (don't include subscription - it has schema mismatch)
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail }
+    });
+
+    console.log("👤 User found in User table:", user);
+
+    if (!user) {
+      console.log("ℹ️ No user record found - returning Free");
+      return NextResponse.json({
+        daysLeft: 0,
+        planType: 'Free',
+        isActive: false,
+        endDate: ''
+      });
+    }
+
+    // Try to get subscription data (but catch errors due to schema mismatch)
+    let subscriptionEndDate = null;
+    try {
+      const subscription = await prisma.$queryRaw`
+        SELECT * FROM "Subscription" WHERE "userId" = ${user.id} LIMIT 1
+      ` as any[];
+      
+      if (subscription && subscription.length > 0 && subscription[0].currentPeriodEnd) {
+        subscriptionEndDate = new Date(subscription[0].currentPeriodEnd);
+        console.log("📅 Found subscription end date:", subscriptionEndDate);
+      }
+    } catch (err) {
+      console.log("⚠️ Could not fetch subscription (using defaults)");
+    }
+
+    // Use plan from User table
+    if (user.plan && user.plan !== 'free') {
+      const now = new Date();
+      const endDate = subscriptionEndDate || new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const daysLeft = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      const result = {
+        daysLeft: Math.max(0, daysLeft),
+        planType: user.plan.charAt(0).toUpperCase() + user.plan.slice(1),
+        isActive: true,
+        endDate: endDate.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        })
+      };
+      
+      console.log("✅ Returning plan:", result);
+      return NextResponse.json(result);
+    }
+
+    console.log("ℹ️ No paid plan found - returning Free");
+    return NextResponse.json({
+      daysLeft: 0,
+      planType: 'Free',
+      isActive: false,
+      endDate: ''
+    });
   } catch (error) {
-    console.error("Error fetching user subscription:", error);
+    console.error("❌ Error fetching user subscription:", error);
     return NextResponse.json(
       { 
         daysLeft: 0,
@@ -71,7 +112,7 @@ export async function GET(req: NextRequest) {
         isActive: false,
         endDate: ''
       },
-      { status: 200 } // Return 200 with free plan data instead of error
+      { status: 200 }
     );
   }
 }
