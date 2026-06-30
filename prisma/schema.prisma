@@ -7,11 +7,40 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id               Int       @id @default(autoincrement())
+  name             String
+  email            String    @unique
+  password         String
+  plan             String    @default("free")
+  stripeCustomerId String?
+  createdAt        DateTime  @default(now())
+  payments         Payment[]
+}
+
+model Subscription {
+  id                 String    @id @default(cuid())
+  userId             String    @unique
+  stripeCustomerId   String?
+  subscriptionId     String?
+  plan               String    @default("free")
+  status             String    @default("inactive")
+  trialEndsAt        DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Payment {
+  id               String   @id @default(cuid())
+  stripePaymentId  String   @unique
+  amount           Float
+  currency         String
+  status           String
+  customerEmail    String
+  stripeCustomerId String?
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id])
+  userId           Int
 }
 
 model Company {
@@ -38,6 +67,7 @@ model ScrapeJob {
   createdAt  DateTime  @default(now())
   companies  Company[]
 }
+
 model WhatsAppMessage {
   id              Int      @id @default(autoincrement())
   from            String
