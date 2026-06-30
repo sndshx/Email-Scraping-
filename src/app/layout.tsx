@@ -17,10 +17,10 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "LeadScraper",
+  title: "ScrapeEngine",
   description: "Find business emails in seconds",
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text y='.9em' font-size='70' x='15' fill='white' font-weight='bold'>L</text></svg>",
+    icon: "/logo.png",
   },
 };
 

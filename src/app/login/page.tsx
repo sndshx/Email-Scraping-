@@ -15,7 +15,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // If the user already has an active session, skip straight to the dashboard
   useEffect(() => {
     if (authLoaded && isSignedIn) {
       router.push('/dashboard')
@@ -44,7 +43,6 @@ export default function LoginPage() {
       const clerkError = err.errors?.[0]
 
       if (clerkError?.code === 'session_exists') {
-        // Already logged in — just send them to the dashboard
         router.push('/dashboard')
         return
       }
@@ -85,7 +83,6 @@ export default function LoginPage() {
     }
   }
 
-  // Avoid flashing the login form while we check session state
   if (!authLoaded || isSignedIn) {
     return null
   }
@@ -119,7 +116,8 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 required
-                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                style={{ '--tw-ring-color': '#3b82f6' } as React.CSSProperties}
+                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:border-[#3b82f6] transition"
               />
             </div>
 
@@ -135,11 +133,13 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 required
-                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                style={{ '--tw-ring-color': '#3b82f6' } as React.CSSProperties}
+                className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:border-[#3b82f6] transition"
               />
               <Link
                 href="/forgot-password"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-blue-600 font-semibold hover:underline"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold hover:underline"
+                style={{ color: '#3b82f6' }}
               >
                 Forgot password?
               </Link>
@@ -148,7 +148,8 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !isLoaded}
-              className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 cursor-pointer"
+              style={{ backgroundColor: loading || !isLoaded ? '#93c5fd' : '#3b82f6' }}
+              className="w-full hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? 'Logging in...' : 'Get Started'}
             </button>
@@ -189,14 +190,14 @@ export default function LoginPage() {
 
           <p className="text-center text-slate-400 text-sm mt-6">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-blue-600 font-bold hover:underline">
+            <Link href="/signup" className="font-bold hover:underline" style={{ color: '#3b82f6' }}>
               Sign up
             </Link>
           </p>
         </div>
 
         <p className="text-center text-slate-400 text-xs mt-6">
-          <Link href="/" className="hover:text-blue-600 transition font-semibold">← Back to home</Link>
+          <Link href="/" className="hover:text-[#3b82f6] transition font-semibold">← Back to home</Link>
         </p>
       </div>
     </div>
