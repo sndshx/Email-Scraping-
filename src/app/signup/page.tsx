@@ -150,30 +150,33 @@ export default function SignupPage() {
             <div className="flex-1 h-px bg-slate-200" />
           </div>
 
-          <div className="flex justify-center gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            {/* Google Button */}
             <button
               onClick={handleGoogle}
               disabled={!isLoaded}
-              className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
+              className="group relative flex items-center justify-center gap-2.5 px-5 py-3.5 bg-white border-2 border-slate-200 hover:border-blue-300 rounded-xl transition-all cursor-pointer disabled:opacity-50 hover:shadow-lg hover:-translate-y-0.5"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 via-blue-50/50 to-blue-50/0 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
+              <svg className="w-5 h-5 relative z-10" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Google
+              <span className="text-sm font-bold text-slate-700 relative z-10">Google</span>
             </button>
 
+            {/* Apple Button */}
             <button
               onClick={handleApple}
               disabled={!isLoaded}
-              className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
+              className="group relative flex items-center justify-center gap-2.5 px-5 py-3.5 bg-black hover:bg-slate-800 border-2 border-black rounded-xl transition-all cursor-pointer disabled:opacity-50 hover:shadow-lg hover:-translate-y-0.5"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white">
                 <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-3.06 1.57-.12 0-.23-.02-.336-.05-.012-.105-.02-.22-.02-.347 0-1.14.55-2.34 1.27-3.16.9-1.04 2.39-1.5 3.27-1.5.075.13.052.27.052.41zm.5 4.55c-1.69 0-3.15.96-3.97.96-.86 0-2.16-.91-3.55-.89-1.83.03-3.5 1.06-4.43 2.71-1.9 3.3-.49 8.23 1.4 10.92.92 1.34 2.02 2.84 3.45 2.79 1.38-.05 1.92-.9 3.62-.9 1.69 0 2.18.9 3.62.88 1.49-.02 2.49-1.36 3.41-2.7 1.07-1.55 1.51-3.07 1.53-3.15-.03-.02-2.93-1.13-2.95-4.47-.02-2.8 2.29-4.14 2.4-4.21-1.31-1.93-3.34-2.13-4.05-2.18-.21-.02-.4-.04-.66-.04-.5 0-1.18.16-1.83.16z"/>
               </svg>
-              Apple
+              <span className="text-sm font-bold text-white">Apple</span>
             </button>
           </div>
 

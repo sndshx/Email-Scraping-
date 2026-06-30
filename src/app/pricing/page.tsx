@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, ArrowRight, Sparkles, Zap, Download } from "lucide-react";
 import Sidebar from "@/app/component/sidebar";
 
-const WEEKLY_PRICE_ID = "price_1TnaKr5ZTEXUpREBzoYN24Lm";
-const MONTHLY_PRICE_ID = "price_1TnYfE5ZTEXUpREBwxNwwEqV";
-const YEARLY_PRICE_ID = "price_1TnYh85ZTEXUpREBy4zrsnzo";
+const PRICE_IDS = {
+  starter: {
+    monthly: "price_1TnYfE5ZTEXUpREBwxNwwEqV", // $29/month ✅ ACTIVE
+    yearly:  "price_1TnwvI5ZTEXUpREBhdfJS2s6",  // $199/year ✅ ACTIVE
+  },
+  plus: {
+    monthly: "price_1TnwtN5ZTEXUpREBI2uOTv98",  // $59/month ✅ ACTIVE
+    yearly:  "price_1Tnwvd5ZTEXUpREBYKPYdWWy",  // $399/year ✅ ACTIVE
+  }
+};
 
 const PLANS = [
   {
@@ -18,7 +25,7 @@ const PLANS = [
     buttonVariant: "outline" as const,
     prices: { monthly: 0, yearly: 0 },
     features: [
-      "50 companies/month",
+      "50 emails/month",
       "1 scraping job at a time",
       "Basic email extraction",
       "CSV export (limited)"
@@ -29,11 +36,11 @@ const PLANS = [
     name: "Starter",
     badge: null,
     description: "More room for everyday writing",
-    buttonText: "Upgrade to Starter",
+    buttonText: "Get Starter",
     buttonVariant: "outline" as const,
     prices: { monthly: 29, yearly: 199 },
     features: [
-      "500 companies/month",
+      "500 emails/month",
       "5 concurrent jobs",
       "Advanced extraction",
       "Unlimited CSV export",
@@ -45,12 +52,12 @@ const PLANS = [
     name: "Plus",
     badge: "Most Popular",
     description: "Best for regular creators",
-    buttonText: "Upgrade to Plus",
+    buttonText: "Get Plus",
     buttonVariant: "primary" as const,
     popular: true,
-    prices: { monthly: 59, yearly: 499 },
+    prices: { monthly: 59, yearly: 399 },
     features: [
-      "Unlimited companies",
+      "Unlimited emails",
       "10 concurrent jobs",
       "Advanced extraction",
       "Unlimited CSV export",
@@ -66,6 +73,7 @@ type BillingType = "monthly" | "yearly";
 export default function PricingPage() {
   const [billing, setBilling] = useState<BillingType>("monthly");
   const [loading, setLoading] = useState<string | null>(null);
+  const [userPlan, setUserPlan] = useState<string>("free"); // Track user's current plan
 
   const getPrice = (planId: string) => {
     const plan = PLANS.find(p => p.id === planId);
@@ -79,30 +87,141 @@ export default function PricingPage() {
     return "/year";
   };
 
+  const getSavingsPercentage = (planId: string) => {
+    const plan = PLANS.find(p => p.id === planId);
+    if (!plan || plan.prices.monthly === 0) return 0;
+    
+    const monthlyTotal = plan.prices.monthly * 12;
+    const yearlyPrice = plan.prices.yearly;
+    const savings = monthlyTotal - yearlyPrice;
+    const percentage = Math.round((savings / monthlyTotal) * 100);
+    
+    return percentage;
+  };
+
+  // Fetch user's current subscription
+  const fetchUserSubscription = async () => {
+    try {
+      const res = await fetch("/api/user-subscription", {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        console.log("📊 User subscription data:", data);
+        
+        // Map the plan from API to our plan IDs
+        const planMap: Record<string, string> = {
+          "free": "free",
+          "Free": "free",
+          "starter": "starter",
+          "Starter": "starter",
+          "plus": "plus",
+          "Plus": "plus",
+          "pro": "plus",
+        };
+        const mappedPlan = planMap[data.planType] || "free";
+        console.log("📦 Setting user plan to:", mappedPlan);
+        setUserPlan(mappedPlan);
+        return mappedPlan;
+      }
+    } catch (err) {
+      console.error("Failed to fetch subscription:", err);
+    }
+    return "free";
+  };
+
+  useEffect(() => {
+    fetchUserSubscription();
+    
+    // Check if returning from successful payment
+    const urlParams = new URLSearchParams(window.location.search);
+    const successParam = urlParams.get('success');
+    const planParam = urlParams.get('plan');
+
+    if (successParam === 'true') {
+      console.log("🎉 Returned from successful payment - refreshing subscription...");
+
+      // Remove success param from URL immediately
+      window.history.replaceState({}, '', '/pricing');
+
+      // If plan is in URL (from checkout), trigger manual upgrade as webhook fallback
+      if (planParam && ['starter', 'plus'].includes(planParam)) {
+        console.log(`🔧 Triggering manual upgrade fallback for plan: ${planParam}`);
+        fetch("/api/manual-upgrade", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: planParam }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            console.log("✅ Manual upgrade result:", data);
+            // Retry fetching subscription after upgrade
+            return fetchUserSubscription();
+          })
+          .catch(err => console.error("Manual upgrade error:", err));
+      }
+
+      // Also retry multiple times to catch webhook updates
+      const retryDelays = [2000, 5000, 10000];
+      retryDelays.forEach(delay => {
+        setTimeout(() => {
+          console.log(`🔄 Retry fetching subscription after ${delay}ms...`);
+          fetchUserSubscription();
+        }, delay);
+      });
+    }
+  }, []);
+
   const handleUpgrade = async (planId: string) => {
-    if (planId === "free") {
+    // Don't allow action if it's the current plan or free plan
+    if (planId === userPlan || planId === 'free') {
       return;
     }
 
     setLoading(planId);
     try {
-      const priceId = billing === "monthly" ? MONTHLY_PRICE_ID : YEARLY_PRICE_ID;
+      // Get the correct price ID based on plan and billing period
+      let priceId = '';
+      if (planId === 'starter') {
+        priceId = billing === "monthly" ? PRICE_IDS.starter.monthly : PRICE_IDS.starter.yearly;
+      } else if (planId === 'plus') {
+        priceId = billing === "monthly" ? PRICE_IDS.plus.monthly : PRICE_IDS.plus.yearly;
+      } else {
+        alert("Invalid plan selected");
+        setLoading(null);
+        return;
+      }
+
+      console.log("🛒 Checkout with:", { planId, priceId, billing });
 
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ 
+          priceId,
+          planName: planId, // Pass plan name (starter or plus)
+        }),
       });
 
       const data = await res.json();
+      
+      console.log("📦 Checkout response:", data);
 
       if (data.url) {
+        console.log("✅ Redirecting to Stripe...");
         window.location.href = data.url;
       } else {
-        alert("Something went wrong. Please try again.");
+        console.error("❌ Checkout failed:", data);
+        alert(data.error || "Something went wrong. Please try again.");
+        if (data.details) {
+          console.error("Error details:", data.details);
+        }
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Error:", error);
       alert("Something went wrong. Please try again.");
     } finally {
       setLoading(null);
@@ -157,14 +276,21 @@ export default function PricingPage() {
                 <button
                   key={b}
                   onClick={() => setBilling(b)}
-                  className={`px-5 py-2 rounded-full text-sm font-semibold transition-all min-w-[100px] ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all min-w-[110px] ${
                     billing === b
                       ? "bg-[#2563EB] text-white shadow-md"
                       : "bg-white border border-slate-200 text-slate-600 hover:border-[#2563EB]"
                   }`}
                 >
                   {b === "monthly" && "Monthly"}
-                  {b === "yearly" && "Yearly"}
+                  {b === "yearly" && (
+                    <span className="flex items-center gap-2">
+                      Yearly
+                      <span className="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        Save 39%
+                      </span>
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -175,6 +301,15 @@ export default function PricingPage() {
                 const isLoading = loading === plan.id;
                 const price = getPrice(plan.id);
                 const features = plan.features;
+                const isCurrentPlan = plan.id === userPlan;
+                
+                // Determine button text based on current plan
+                let buttonText = `Get ${plan.name}`;
+                if (isCurrentPlan) {
+                  buttonText = "Current Plan";
+                } else if (plan.id === 'free') {
+                  buttonText = "Current Plan"; // Free is always current for non-paid users
+                }
                 
                 return (
                   <div
@@ -191,9 +326,11 @@ export default function PricingPage() {
                         <div className={`text-[10px] font-bold px-3 py-1 rounded-full shadow-lg ${
                           plan.popular 
                             ? "bg-slate-800 text-white"
+                            : isCurrentPlan
+                            ? "bg-green-100 text-green-700 border border-green-300"
                             : "bg-slate-100 text-slate-600 border border-slate-200"
                         }`}>
-                          {plan.badge}
+                          {isCurrentPlan ? "CURRENT" : plan.badge}
                         </div>
                       </div>
                     )}
@@ -213,23 +350,30 @@ export default function PricingPage() {
                         )}
                       </div>
                       {billing === "yearly" && price !== "Free" && (
-                        <p className="text-xs text-slate-400 mt-1">
-                          Save ${plan.prices.monthly * 12 - plan.prices.yearly} per year
-                        </p>
+                        <div className="mt-2 flex items-center gap-1.5">
+                          <div className="flex items-center gap-1 bg-green-50 border border-green-200 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Save ${plan.prices.monthly * 12 - plan.prices.yearly}/year
+                          </div>
+                        </div>
                       )}
                     </div>
 
                     {/* CTA Button */}
                     <button
                       onClick={() => handleUpgrade(plan.id)}
-                      disabled={isLoading || plan.id === "free"}
+                      disabled={isLoading || isCurrentPlan || plan.id === 'free'}
                       className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 mb-6 ${
-                        plan.buttonVariant === "primary"
+                        isCurrentPlan || plan.id === 'free'
+                          ? "bg-green-50 text-green-700 border-2 border-green-300 cursor-not-allowed"
+                          : plan.buttonVariant === "primary"
                           ? "bg-[#2563EB] text-white hover:bg-blue-700 shadow-md shadow-blue-200"
                           : "bg-white text-slate-700 border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                       } disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
-                      {isLoading ? "Loading..." : plan.buttonText}
+                      {isLoading ? "Loading..." : buttonText}
                     </button>
 
                     {/* Features */}

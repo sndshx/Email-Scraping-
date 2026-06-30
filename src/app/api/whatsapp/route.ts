@@ -64,34 +64,16 @@ async function sendWhatsAppMessage(to: string, message: string) {
   }
 }
 
-// Get or create user subscription based on phone number
+// Get user subscription based on phone number
+// WhatsApp users don't have accounts, so we return a default free plan
 async function getUserSubscription(phoneNumber: string) {
-  // Try to find existing subscription by phone (we'll use WhatsApp messages to track)
-  const recentMessage = await prisma.whatsAppMessage.findFirst({
-    where: { from: phoneNumber },
-    orderBy: { createdAt: 'desc' }
-  })
-
-  // For now, we'll link phone numbers to subscriptions via a userId pattern
-  // In production, you'd want a proper WhatsAppUser table
-  
-  // Check if subscription exists - using phone as userId for WhatsApp users
-  let subscription = await prisma.subscription.findUnique({
-    where: { userId: phoneNumber }
-  })
-
-  if (!subscription) {
-    // Create new free subscription
-    subscription = await prisma.subscription.create({
-      data: {
-        userId: phoneNumber,
-        plan: 'free',
-        status: 'active'
-      }
-    })
-  }
-
-  return subscription
+  // WhatsApp users use free plan by default
+  // (Subscription table requires a User.id Int FK, not phone string)
+  return {
+    plan: 'free',
+    status: 'active',
+    userId: 0,
+  };
 }
 
 // Check if user has exceeded their plan limits
