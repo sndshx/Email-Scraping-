@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Play,
@@ -11,24 +12,13 @@ import {
 import Sidebar from "@/app/component/sidebar";
 
 const SCRAPERS = [
-  {
-    id: "linkedin",
-    label: "LinkedIn",
-    color: "bg-blue-50 text-blue-700 border-blue-200",
-  },
-  {
-    id: "google_maps",
-    label: "Google Maps",
-    color: "bg-green-50 text-green-700 border-green-200",
-  },
-  {
-    id: "apollo",
-    label: "Apollo.io",
-    color: "bg-violet-50 text-violet-700 border-violet-200",
-  },
+  { id: "linkedin", label: "LinkedIn", color: "bg-blue-50 text-blue-700 border-blue-200" },
+  { id: "google_maps", label: "Google Maps", color: "bg-green-50 text-green-700 border-green-200" },
+  { id: "apollo", label: "Apollo.io", color: "bg-violet-50 text-violet-700 border-violet-200" },
 ];
 
 export default function ScrapePage() {
+  const router = useRouter();
   const [selectedScraper, setSelectedScraper] = useState("");
   const [keyword, setKeyword] = useState("");
   const [industry, setIndustry] = useState("");
@@ -65,6 +55,12 @@ export default function ScrapePage() {
 
       const data = await res.json();
 
+      // ── Auto redirect to pricing if limit reached ──────────────────────
+      if (res.status === 403 && data.error === "LIMIT_REACHED") {
+        router.push(data.upgradeUrl || "/pricing");
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error || "Scraping failed");
 
       setResult({
@@ -72,6 +68,11 @@ export default function ScrapePage() {
         message: "Scraping completed!",
         count: data.count,
       });
+
+      // If this scrape pushed user to the limit, redirect after 1.5s
+      if (data.usage?.isLimitReached) {
+        setTimeout(() => router.push("/pricing"), 1500);
+      }
     } catch (err: any) {
       setResult({
         success: false,
@@ -87,23 +88,15 @@ export default function ScrapePage() {
       <Sidebar />
 
       <div className="flex-1 overflow-auto flex flex-col">
-        {/* Header */}
+        {/* Header — envelope icon removed */}
         <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-9 h-9 rounded-lg bg-[#2563EB] flex items-center justify-center flex-shrink-0 shadow-sm">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="6" width="18" height="12" rx="2" stroke="white" strokeWidth="2" fill="none" />
-                <path d="M3 8L12 13L21 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">
-                Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
-              </h1>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Start a new scraping job below.
-              </p>
-            </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">
+              Welcome back, <span className="text-[#2563EB]">ScrapeEngine</span>
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Start a new scraping job below.
+            </p>
           </div>
           <div className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
             <span className="text-white text-sm font-extrabold leading-none select-none">S</span>
