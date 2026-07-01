@@ -118,11 +118,6 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center space-y-8">
 
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-[#3b82f6] px-4 py-2 rounded-full text-xs font-bold border border-blue-200">
-              <span style={{ backgroundColor: '#3b82f6' }} className="text-white text-[10px] px-2 py-0.5 rounded-full">New</span>
-              Next-Gen Social Media Scraper
-            </div>
-
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight max-w-3xl mx-auto">
               Extract Verified Leads From <span style={{ color: '#3b82f6' }}>Social Media</span>
             </h1>
