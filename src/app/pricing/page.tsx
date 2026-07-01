@@ -19,7 +19,7 @@ const PLANS = [
   {
     id: "free",
     name: "Free",
-    description: "Humanize your everyday writing",
+    description: "Try it out, no credit card needed",
     prices: { monthly: 0, yearly: 0 },
     features: [
       "50 emails/month",
@@ -31,7 +31,7 @@ const PLANS = [
   {
     id: "starter",
     name: "Starter",
-    description: "More room for everyday writing",
+    description: "More leads for growing outreach",
     prices: { monthly: 29, yearly: 199 },
     features: [
       "500 emails/month",
@@ -44,7 +44,7 @@ const PLANS = [
   {
     id: "plus",
     name: "Plus",
-    description: "Best for regular creators",
+    description: "Best for high-volume lead gen",
     prices: { monthly: 59, yearly: 399 },
     features: [
       "Unlimited emails",
@@ -196,34 +196,33 @@ export default function PricingPage() {
             </div>
 
             {/* Billing Toggle */}
-            {/* Billing Toggle */}
-<div className="flex items-center justify-center">
-  <div className="flex items-center bg-white border border-slate-200 rounded-full p-1 shadow-sm">
-    <button
-      onClick={() => setBilling("monthly")}
-      className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-        billing === "monthly"
-          ? "bg-[#2563EB] text-white shadow-sm"
-          : "text-slate-500 hover:text-slate-700"
-      }`}
-    >
-      Monthly
-    </button>
-    <button
-      onClick={() => setBilling("yearly")}
-      className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-        billing === "yearly"
-          ? "bg-[#2563EB] text-white shadow-sm"
-          : "text-slate-500 hover:text-slate-700"
-      }`}
-    >
-      Yearly
-      <span className="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
-        Save 39%
-      </span>
-    </button>
-  </div>
-</div>
+            <div className="flex items-center justify-center">
+              <div className="flex items-center bg-white border border-slate-200 rounded-full p-1 shadow-sm">
+                <button
+                  onClick={() => setBilling("monthly")}
+                  className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                    billing === "monthly"
+                      ? "bg-[#2563EB] text-white shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setBilling("yearly")}
+                  className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                    billing === "yearly"
+                      ? "bg-[#2563EB] text-white shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  Yearly
+                  <span className="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    Save 39%
+                  </span>
+                </button>
+              </div>
+            </div>
 
             {/* Pricing Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
