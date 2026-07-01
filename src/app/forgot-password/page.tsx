@@ -118,14 +118,16 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
                   required
-                  className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                  style={{ '--tw-ring-color': '#3b82f6' } as React.CSSProperties}
+                  className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:border-[#3b82f6] transition"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading || !isLoaded}
-                className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-bold py-3.5 rounded-xl transition text-sm cursor-pointer"
+                style={{ backgroundColor: loading || !isLoaded ? '#93c5fd' : '#3b82f6' }}
+                className="w-full hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-sm cursor-pointer"
               >
                 {loading ? 'Sending code...' : 'Send Reset Code'}
               </button>
@@ -139,7 +141,8 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="6-digit code"
                   required
-                  className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition tracking-widest"
+                  style={{ '--tw-ring-color': '#3b82f6' } as React.CSSProperties}
+                  className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:border-[#3b82f6] transition tracking-widest"
                 />
               </div>
 
@@ -156,14 +159,16 @@ export default function ForgotPasswordPage() {
                   placeholder="New password"
                   required
                   minLength={8}
-                  className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                  style={{ '--tw-ring-color': '#3b82f6' } as React.CSSProperties}
+                  className="w-full bg-slate-100 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:border-[#3b82f6] transition"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading || !isLoaded}
-                className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-bold py-3.5 rounded-xl transition text-sm cursor-pointer"
+                style={{ backgroundColor: loading || !isLoaded ? '#93c5fd' : '#3b82f6' }}
+                className="w-full hover:opacity-90 text-white font-bold py-3.5 rounded-xl transition text-sm cursor-pointer"
               >
                 {loading ? 'Resetting...' : 'Reset Password & Sign In'}
               </button>
@@ -175,7 +180,7 @@ export default function ForgotPasswordPage() {
                   setError('')
                   setMessage('')
                 }}
-                className="w-full text-slate-400 text-xs font-semibold hover:text-blue-600 transition cursor-pointer"
+                className="w-full text-slate-400 text-xs font-semibold hover:text-[#3b82f6] transition cursor-pointer"
               >
                 Didn't get a code? Try again
               </button>
@@ -184,14 +189,14 @@ export default function ForgotPasswordPage() {
 
           <p className="text-center text-slate-400 text-sm mt-6">
             Remembered your password?{' '}
-            <Link href="/login" className="text-blue-600 font-bold hover:underline">
+            <Link href="/login" className="font-bold hover:underline" style={{ color: '#3b82f6' }}>
               Login
             </Link>
           </p>
         </div>
 
         <p className="text-center text-slate-400 text-xs mt-6">
-          <Link href="/" className="hover:text-blue-600 transition font-semibold">← Back to home</Link>
+          <Link href="/" className="hover:text-[#3b82f6] transition font-semibold">← Back to home</Link>
         </p>
       </div>
     </div>

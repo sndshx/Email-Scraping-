@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { useState } from "react";
+import { useClerk } from "@clerk/nextjs";
 import {
   LayoutDashboard,
   ScanSearch,
@@ -21,6 +23,21 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { signOut } = useClerk();
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOut(() => {
+        window.location.href = "/";
+      });
+    } catch (err) {
+      console.error("Sign out failed:", err);
+      window.location.href = "/";
+    }
+  };
 
   return (
     <aside className="hidden md:flex w-56 min-h-screen bg-white border-r border-slate-200 flex-col sticky top-0 h-screen">
@@ -75,11 +92,12 @@ export default function Sidebar() {
       {/* Sign Out */}
       <div className="px-3 py-4 border-t border-slate-100">
         <button
-          onClick={() => { window.location.href = "/"; }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer"
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer disabled:opacity-60"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
-          Sign Out
+          {signingOut ? "Signing out..." : "Sign Out"}
         </button>
       </div>
     </aside>

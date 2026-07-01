@@ -8,17 +8,17 @@ datasource db {
 
 model User {
   id               Int           @id @default(autoincrement())
+  clerkId          String?       @unique   
   name             String
   email            String        @unique
   password         String
   plan             String        @default("free")
-  planExpiry       DateTime?     // When the plan expires
+  planExpiry       DateTime?
   stripeCustomerId String?
   createdAt        DateTime      @default(now())
   payments         Payment[]
-  subscription     Subscription?   
+  subscription     Subscription?
 }
-
 model Subscription {
   id                   String    @id @default(cuid())
   userId               Int       @unique   
