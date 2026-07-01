@@ -27,10 +27,6 @@ export async function POST(req: NextRequest) {
       console.log("✅ Payment successful!", session.customer_email);
 
       try {
-        const paymentIntent = await stripe.paymentIntents.retrieve(
-          session.payment_intent as string
-        );
-
         let planType = session.metadata?.plan || "plus";
         const userEmail = session.metadata?.userEmail || session.customer_email!;
 
@@ -79,7 +75,19 @@ export async function POST(req: NextRequest) {
           console.log(`✅ Updated user plan to: ${planType}`);
         }
 
-        // Save to database (User table only - skip Subscription table due to schema mismatch)
+        // ✅ Actually save the payment record
+        await prisma.payment.create({
+          data: {
+            stripePaymentId: (session.payment_intent as string) || session.id,
+            amount: (session.amount_total ?? 0) / 100, // Stripe amounts are in cents
+            currency: session.currency || "usd",
+            status: session.payment_status || "unknown",
+            customerEmail: userEmail,
+            stripeCustomerId: session.customer as string,
+            userId: user.id,
+          }
+        });
+
         console.log("✅ Payment and user plan saved to database");
         console.log(`📅 Subscription will renew on: ${subscriptionEndDate || 'N/A'}`);
       } catch (dbError) {
