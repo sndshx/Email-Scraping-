@@ -1,5 +1,5 @@
 ﻿"use client";
-
+import Sidebar from "@/app/component/sidebar";
 import { useEffect, useState, useRef } from "react";
 import { RefreshCw, LayoutDashboard, ScanSearch, Table2, History, LogOut, Zap } from "lucide-react";
 import Link from "next/link";
@@ -131,68 +131,6 @@ function LineChart({ data }: { data: number[] }) {
         <text key={i} x={xs[i]} y={h - 6} textAnchor="middle" fontSize="9" fill="#9ca3af">{d}</text>
       ))}
     </svg>
-  );
-}
-
-// ── Sidebar ────────────────────────────────────────────────────────────────
-function Sidebar() {
-  const pathname = usePathname();
-  const { signOut } = useClerk();
-  const navItems = [
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Scraper", href: "/scrape", icon: ScanSearch },
-    { label: "Result", href: "/results", icon: Table2 },
-    { label: "History", href: "/history", icon: History },
-  ];
-
-  return (
-    <aside className="hidden md:flex w-56 min-h-screen bg-white border-r border-slate-100 flex-col sticky top-0 h-screen">
-      <div className="flex items-center gap-2.5 h-16 px-5 border-b border-slate-100">
-        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-          <rect x="2" y="6" width="24" height="17" rx="2.5" fill="#2563EB" />
-          <polyline points="2,6 14,16 26,6" stroke="white" strokeWidth="1.8" strokeLinejoin="round" fill="none" />
-        </svg>
-        <span className="text-[16px] font-bold text-[#2563EB]">ScrapeEngine</span>
-      </div>
-
-      <nav className="flex flex-col gap-0.5 flex-1 px-3 py-4">
-        {navItems.map((item) => {
-          const active = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                active ? "bg-blue-50 text-[#2563EB]" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-              }`}
-            >
-              <item.icon className={`w-4 h-4 ${active ? "text-[#2563EB]" : "text-slate-400"}`} />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="px-3 pb-2">
-        <Link
-          href="/pricing"
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all"
-        >
-          <Zap className="w-4 h-4" />
-          Upgrade to Pro
-        </Link>
-      </div>
-
-      <div className="px-3 py-4 border-t border-slate-100">
-        <button
-          onClick={() => signOut({ redirectUrl: "/" })}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
-        >
-          <LogOut className="w-4 h-4" />
-          sign out
-        </button>
-      </div>
-    </aside>
   );
 }
 
