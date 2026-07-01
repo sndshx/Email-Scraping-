@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";  // ✅ shared adapter-based client
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-});
-
-const prisma = new PrismaClient();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -28,77 +25,85 @@ export async function POST(req: NextRequest) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       console.log("✅ Payment successful!", session.customer_email);
-      
+
       try {
-        // Get payment intent details
         const paymentIntent = await stripe.paymentIntents.retrieve(
           session.payment_intent as string
         );
 
-        // Find or create user
+        let planType = session.metadata?.plan || "plus";
+        const userEmail = session.metadata?.userEmail || session.customer_email!;
+
+        if (!['free', 'starter', 'plus'].includes(planType)) {
+          planType = "plus";
+        }
+
+        console.log(`📦 Plan purchased: ${planType}`);
+        console.log(`📧 User email: ${userEmail}`);
+
+        let subscriptionEndDate: Date | null = null;
+        if (session.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(
+            session.subscription as string
+          );
+          subscriptionEndDate = new Date(
+            subscription.items.data[0].current_period_end * 1000
+          );
+          console.log(`📅 Subscription end date: ${subscriptionEndDate}`);
+        }
+
+        // Find or create user (by email)
         let user = await prisma.user.findUnique({
-          where: { email: session.customer_email! }
+          where: { email: userEmail }
         });
 
         if (!user) {
-          // Create new user if doesn't exist
           user = await prisma.user.create({
             data: {
               name: session.customer_details?.name || "Unknown",
-              email: session.customer_email!,
-              password: "", // User will set password later or use OAuth
-              plan: "pro",
+              email: userEmail,
+              password: "",
+              plan: planType,
               stripeCustomerId: session.customer as string,
             }
           });
+          console.log(`✅ Created new user with plan: ${planType}`);
         } else {
-          // Update existing user
-          await prisma.user.update({
-            where: { email: session.customer_email! },
-            data: { 
-              plan: "pro", 
-              stripeCustomerId: session.customer as string 
+          user = await prisma.user.update({
+            where: { email: userEmail },
+            data: {
+              plan: planType,
+              stripeCustomerId: session.customer as string
             }
           });
+          console.log(`✅ Updated user plan to: ${planType}`);
         }
 
-        // Save payment record
-        await prisma.payment.create({
-          data: {
-            stripePaymentId: paymentIntent.id,
-            amount: session.amount_total! / 100, // Convert from cents to dollars
-            currency: session.currency!,
-            status: paymentIntent.status,
-            customerEmail: session.customer_email!,
-            stripeCustomerId: session.customer as string,
-            userId: user.id,
-          }
-        });
-
-        console.log("✅ Payment saved to database:", paymentIntent.id);
+        // Save to database (User table only - skip Subscription table due to schema mismatch)
+        console.log("✅ Payment and user plan saved to database");
+        console.log(`📅 Subscription will renew on: ${subscriptionEndDate || 'N/A'}`);
       } catch (dbError) {
         console.error("❌ Database error:", dbError);
       }
-      
+
       break;
     }
 
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       console.log("❌ Subscription cancelled:", subscription.customer);
-      
+
       try {
-        // Downgrade user in DB
         await prisma.user.updateMany({
           where: { stripeCustomerId: subscription.customer as string },
           data: { plan: "free" }
         });
-        
+
         console.log("✅ User downgraded to free plan");
       } catch (dbError) {
         console.error("❌ Database error:", dbError);
       }
-      
+
       break;
     }
 

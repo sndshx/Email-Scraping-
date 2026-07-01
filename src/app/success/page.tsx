@@ -71,6 +71,25 @@ export default function SuccessPage() {
   useEffect(() => {
     const fetchSubscriptionDetails = async () => {
       try {
+        // ✅ Read plan from URL (e.g. ?plan=plus or ?plan=starter)
+        const planParam = searchParams.get("plan");
+
+        // ✅ Trigger manual upgrade as webhook fallback (works in local dev)
+        if (planParam && ['starter', 'plus'].includes(planParam)) {
+          console.log(`🔧 Triggering manual upgrade for plan: ${planParam}`);
+          try {
+            const upgradeRes = await fetch("/api/manual-upgrade", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ plan: planParam }),
+            });
+            const upgradeData = await upgradeRes.json();
+            console.log("✅ Manual upgrade result:", upgradeData);
+          } catch (upgradeErr) {
+            console.error("Manual upgrade failed:", upgradeErr);
+          }
+        }
+
         if (sessionId) {
           // Fetch session details from your API
           const response = await fetch(`/api/subscription-details?session_id=${sessionId}`);
@@ -79,16 +98,13 @@ export default function SuccessPage() {
             const data = await response.json();
             calculateSubscriptionInfo(data.interval);
           } else {
-            // Default to monthly if API fails
             calculateSubscriptionInfo('month');
           }
         } else {
-          // Default to monthly if no session ID
           calculateSubscriptionInfo('month');
         }
       } catch (err) {
         console.error('Error fetching subscription:', err);
-        // Default to monthly on error
         calculateSubscriptionInfo('month');
       } finally {
         setLoading(false);
@@ -96,9 +112,9 @@ export default function SuccessPage() {
       }
     };
 
-    const timer = setTimeout(fetchSubscriptionDetails, 1500);
+    const timer = setTimeout(fetchSubscriptionDetails, 1000);
     return () => clearTimeout(timer);
-  }, [sessionId]);
+  }, [sessionId, searchParams]);
 
   const calculateSubscriptionInfo = (interval: string) => {
     const today = new Date();

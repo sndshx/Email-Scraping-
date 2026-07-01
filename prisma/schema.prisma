@@ -7,28 +7,33 @@ datasource db {
 }
 
 model User {
-  id               Int       @id @default(autoincrement())
+  id               Int           @id @default(autoincrement())
   name             String
-  email            String    @unique
+  email            String        @unique
   password         String
-  plan             String    @default("free")
+  plan             String        @default("free")
+  planExpiry       DateTime?     // When the plan expires
   stripeCustomerId String?
-  createdAt        DateTime  @default(now())
+  createdAt        DateTime      @default(now())
   payments         Payment[]
+  subscription     Subscription?   
 }
 
 model Subscription {
-  id                 String    @id @default(cuid())
-  userId             String    @unique
-  stripeCustomerId   String?
-  subscriptionId     String?
-  plan               String    @default("free")
-  status             String    @default("inactive")
-  trialEndsAt        DateTime?
-  currentPeriodEnd   DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  userId               Int       @unique   
+  user                 User      @relation(fields: [userId], references: [id])
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  status               String    @default("inactive")
+  plan                 String    @default("free")
+  billingCycle         String    @default("monthly")
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
+
 
 model Payment {
   id               String   @id @default(cuid())

@@ -7,6 +7,8 @@ const isPublicRoute = createRouteMatcher([
   '/forgot-password(.*)',
   '/verify-email(.*)',
   '/api/whatsapp(.*)',
+  '/api/webhook(.*)',       // ✅ Stripe webhook must be public (no Clerk session)
+  '/api/subscription-details(.*)', // ✅ Called from success page with session_id
 ])
 
 export default clerkMiddleware(
@@ -15,9 +17,14 @@ export default clerkMiddleware(
       await auth.protect()
     }
   },
-  { debug: true }
+  { debug: false }  // ✅ Disabled debug logs
 )
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    // Skip Next.js internals and all static files (images, fonts, etc.) unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 }
