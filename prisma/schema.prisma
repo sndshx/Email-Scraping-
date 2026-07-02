@@ -8,7 +8,7 @@ datasource db {
 
 model User {
   id               Int           @id @default(autoincrement())
-  clerkId          String?       @unique   
+  clerkId          String?       @unique
   name             String
   email            String        @unique
   password         String
@@ -19,9 +19,10 @@ model User {
   payments         Payment[]
   subscription     Subscription?
 }
+
 model Subscription {
   id                   String    @id @default(cuid())
-  userId               Int       @unique   
+  userId               Int       @unique
   user                 User      @relation(fields: [userId], references: [id])
   stripeSubscriptionId String?
   stripePriceId        String?
@@ -33,7 +34,6 @@ model Subscription {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 }
-
 
 model Payment {
   id               String   @id @default(cuid())
@@ -80,4 +80,16 @@ model WhatsAppMessage {
   aiReply         String
   status          String   @default("SUCCESS")
   createdAt       DateTime @default(now())
+}
+
+model WhatsAppUser {
+  id               String    @id @default(cuid())
+  phoneNumber      String    @unique
+  plan             String    @default("free")
+  stripeCustomerId String?
+  subscriptionId   String?
+  scrapeCount      Int       @default(0)
+  trialEndsAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
