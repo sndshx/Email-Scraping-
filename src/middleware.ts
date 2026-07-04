@@ -6,6 +6,10 @@ const isPublicRoute = createRouteMatcher([
   '/signup(.*)',
   '/forgot-password(.*)',
   '/verify-email(.*)',
+  '/admin/login(.*)',
+  '/admin(.*)',             // ✅ Custom admin auth handles authorization
+  '/api/admin/login(.*)',   
+  '/api/admin(.*)',         // ✅ Custom admin auth handles authorization
   '/api/whatsapp(.*)',
   '/api/webhook(.*)',       // ✅ Stripe webhook must be public (no Clerk session)
   '/api/subscription-details(.*)', // ✅ Called from success page with session_id
