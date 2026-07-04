@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 const ACTOR_MAP: Record<string, string> = {
@@ -28,10 +29,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get authenticated user from Clerk
+    const { userId: clerkId } = await auth();
+    let dbUser = null;
+
+    if (clerkId) {
+      const { clerkClient } = await import("@clerk/nextjs/server");
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(clerkId);
+      const email = clerkUser.emailAddresses[0]?.emailAddress;
+
+      if (email) {
+        dbUser = await prisma.user.findUnique({
+          where: { email }
+        });
+      }
+    }
+
+    // Check if user is banned
+    if (dbUser?.isBanned) {
+      return NextResponse.json(
+        { error: `Your account is banned. Reason: ${dbUser.banReason || "Not specified"}` },
+        { status: 403 }
+      );
+    }
+
+    // Check scrape count limit
+    if (dbUser && dbUser.scrapeCount >= dbUser.scrapeLimit) {
+      return NextResponse.json(
+        { error: `Scrape limit reached (${dbUser.scrapeCount}/${dbUser.scrapeLimit}). Please upgrade your plan.` },
+        { status: 403 }
+      );
+    }
+
     const job = await prisma.scrapeJob.create({
       data: {
         query: keyword,
         status: "RUNNING",
+        userId: dbUser?.id || null
       },
     });
 
@@ -134,6 +169,14 @@ export async function POST(request: NextRequest) {
       where: { id: job.id },
       data: { status: "SUCCESS", totalFound: companiesData.length },
     });
+
+    // Increment user scrapeCount on success
+    if (dbUser) {
+      await prisma.user.update({
+        where: { id: dbUser.id },
+        data: { scrapeCount: { increment: companiesData.length } },
+      });
+    }
 
     return NextResponse.json({ count: companiesData.length });
   } catch (error) {

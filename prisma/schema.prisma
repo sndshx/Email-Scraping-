@@ -11,13 +11,20 @@ model User {
   clerkId          String?       @unique
   name             String
   email            String        @unique
-  password         String
+  password         String?
+  role             String        @default("user")  // "user" | "admin" | "moderator"
   plan             String        @default("free")
   planExpiry       DateTime?
+  scrapeCount      Int           @default(0)
+  scrapeLimit      Int           @default(50)
+  isBanned         Boolean       @default(false)
+  banReason        String?
   stripeCustomerId String?
+  whatsappNumber   String?
   createdAt        DateTime      @default(now())
   payments         Payment[]
   subscription     Subscription?
+  scrapeJobs       ScrapeJob[]
 }
 
 model Subscription {
@@ -71,6 +78,8 @@ model ScrapeJob {
   totalFound Int       @default(0)
   createdAt  DateTime  @default(now())
   companies  Company[]
+  userId     Int?
+  user       User?     @relation(fields: [userId], references: [id])
 }
 
 model WhatsAppMessage {
