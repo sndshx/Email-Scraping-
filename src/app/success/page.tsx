@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle2, ArrowRight, Loader2, Zap, Shield, Sparkles as SparklesIcon } from "lucide-react";
 import Sidebar from "@/app/component/sidebar";
@@ -55,7 +55,7 @@ const ConfettiParticle = ({ delay, type }: { delay: number; type: 'square' | 'ci
   );
 };
 
-export default function SuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -432,5 +432,17 @@ export default function SuccessPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen bg-[#0F172A] items-center justify-center">
+        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }

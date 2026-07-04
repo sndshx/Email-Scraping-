@@ -16,11 +16,28 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // After Clerk login, check if admin → redirect to /admin, else /dashboard
+  async function redirectAfterLogin(emailOverride?: string) {
+    try {
+      const res = await fetch('/api/admin/auto-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailOverride || email }),
+      })
+      const data = await res.json()
+      if (data.isAdmin) {
+        router.push('/admin')
+        return
+      }
+    } catch (_) {}
+    router.push('/dashboard')
+  }
+
   useEffect(() => {
     if (authLoaded && isSignedIn) {
-      router.push('/dashboard')
+      redirectAfterLogin()
     }
-  }, [authLoaded, isSignedIn, router])
+  }, [authLoaded, isSignedIn])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -28,6 +45,26 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
+    // 1. Try custom admin DB login first
+    try {
+      console.log("Client: Initiating custom admin DB login check for:", email)
+      const adminRes = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      console.log("Client: Received adminRes status code:", adminRes.status)
+      const adminData = await adminRes.json()
+      console.log("Client: Received adminData response JSON:", adminData)
+      if (adminRes.ok && adminData.success) {
+        window.location.href = '/admin'
+        return
+      }
+    } catch (err) {
+      console.error('Client: Admin pre-auth fetch failed with error:', err)
+    }
+
+    // 2. Fallback to Clerk login
     try {
       const result = await signIn.create({
         identifier: email,
@@ -36,7 +73,7 @@ export default function LoginPage() {
 
       if ('status' in result && result.status === 'complete') {
         await signIn.reload()
-        router.push('/dashboard')
+        await redirectAfterLogin()
       } else {
         setError('Login incomplete, please try again')
       }
@@ -44,12 +81,12 @@ export default function LoginPage() {
       const clerkError = err.errors?.[0]
 
       if (clerkError?.code === 'session_exists') {
-        router.push('/dashboard')
+        await redirectAfterLogin()
         return
       }
 
       if (clerkError?.code === 'form_password_incorrect' || clerkError?.code === 'strategy_for_user_invalid') {
-        setError('This email is linked to a Google/Apple account. Please use "Continue with Google" or "Continue with Apple" to sign in.')
+        setError('Incorrect password. If your email is linked to a Google/Apple account, please use that button below.')
       } else {
         setError(clerkError?.message || err.message || 'Login failed')
       }

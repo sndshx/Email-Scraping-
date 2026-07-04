@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useClerk } from "@clerk/nextjs";
 import {
   LayoutDashboard,
@@ -12,6 +12,7 @@ import {
   History,
   LogOut,
   Zap,
+  ShieldCheck,
 } from "lucide-react";
 
 const navItems = [
@@ -25,6 +26,14 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { signOut } = useClerk();
   const [signingOut, setSigningOut] = useState(false);
+  const [userRole, setUserRole] = useState<string>('user');
+
+  useEffect(() => {
+    fetch('/api/user-info')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.role) setUserRole(data.role); })
+      .catch(() => {});
+  }, []);
 
   const handleSignOut = async () => {
     if (signingOut) return;
@@ -76,6 +85,21 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        {/* Admin Panel link — only visible for admins */}
+        {userRole === 'admin' && (
+          <Link
+            href="/admin"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              pathname.startsWith('/admin')
+                ? 'bg-red-50 text-red-600'
+                : 'text-red-500 hover:bg-red-50 hover:text-red-700'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 flex-shrink-0" />
+            Admin Panel
+          </Link>
+        )}
       </nav>
 
       {/* Upgrade to Pro */}
