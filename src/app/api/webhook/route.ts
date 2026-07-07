@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import twilio from "twilio";
+import { Resend } from "resend";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const twilioClient = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -20,6 +22,54 @@ async function sendWhatsAppMessage(to: string, message: string) {
     console.log(`✅ WhatsApp sent to ${to}`)
   } catch (error: any) {
     console.error('WhatsApp send error:', error.message)
+  }
+}
+
+async function sendPaymentSuccessEmail(
+  email: string,
+  planName: string,
+  features: string,
+  renewDate: string,
+  amount: number
+) {
+  try {
+    await resend.emails.send({
+      from: 'ScrapeEngine <onboarding@resend.dev>',
+      to: email,
+      subject: `🎉 Payment Successful — Welcome to ${planName}!`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9fafb; border-radius: 12px;">
+          <div style="background: #16a34a; padding: 24px; border-radius: 8px; text-align: center; margin-bottom: 24px;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">🎉 Payment Successful!</h1>
+          </div>
+
+          <div style="background: white; padding: 24px; border-radius: 8px; margin-bottom: 16px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 8px 0; color: #6b7280;">Plan</td><td style="padding: 8px 0; font-weight: bold; text-align: right;">${planName}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280;">Email</td><td style="padding: 8px 0; text-align: right;">${email}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280;">Status</td><td style="padding: 8px 0; text-align: right; color: #16a34a; font-weight: bold;">✅ Paid</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280;">Renews</td><td style="padding: 8px 0; text-align: right;">${renewDate}</td></tr>
+              <tr style="border-top: 2px solid #e5e7eb;">
+                <td style="padding: 12px 0; font-weight: bold; font-size: 18px;">Amount Paid</td>
+                <td style="padding: 12px 0; font-weight: bold; font-size: 18px; text-align: right; color: #2563EB;">$${amount}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="background: white; padding: 24px; border-radius: 8px; margin-bottom: 16px;">
+            <h3 style="color: #1f2937; margin-top: 0;">🚀 You now have access to:</h3>
+            <p style="color: #4b5563; line-height: 1.8;">${features}</p>
+          </div>
+
+          <p style="color: #9ca3af; text-align: center; font-size: 12px;">
+            Thank you for upgrading ScrapeEngine! Go back to WhatsApp to start scraping. 😊
+          </p>
+        </div>
+      `,
+    })
+    console.log(`✅ Payment success email sent to ${email}`)
+  } catch (error: any) {
+    console.error('Error sending payment success email:', error.message)
   }
 }
 
@@ -71,22 +121,14 @@ export async function POST(req: NextRequest) {
         const userEmail = session.metadata?.userEmail || session.customer_email!;
         const whatsappPhone = session.metadata?.whatsappPhone || session.client_reference_id || null;
 
-        if (!['free', 'starter', 'plus'].includes(planType)) {
-          planType = "plus";
-        }
+        if (!['free', 'starter', 'plus'].includes(planType)) planType = "plus";
 
-        console.log(`📦 Plan purchased: ${planType}`);
-        console.log(`📧 User email: ${userEmail}`);
-        console.log(`📱 WhatsApp phone: ${whatsappPhone}`);
+        console.log(`📦 Plan: ${planType} | 📧 Email: ${userEmail} | 📱 Phone: ${whatsappPhone}`);
 
         let subscriptionEndDate: Date | null = null;
         if (session.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(
-            session.subscription as string
-          );
-          subscriptionEndDate = new Date(
-            subscription.items.data[0].current_period_end * 1000
-          );
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+          subscriptionEndDate = new Date(subscription.items.data[0].current_period_end * 1000);
         }
 
         // Find or create user
@@ -102,7 +144,6 @@ export async function POST(req: NextRequest) {
               stripeCustomerId: session.customer as string,
             }
           });
-          console.log(`✅ Created new user with plan: ${planType}`);
         } else {
           user = await prisma.user.update({
             where: { email: userEmail },
@@ -112,10 +153,9 @@ export async function POST(req: NextRequest) {
               planExpiry: subscriptionEndDate,
             }
           });
-          console.log(`✅ Updated user plan to: ${planType}`);
         }
 
-        // Save payment record
+        // Save payment
         await prisma.payment.create({
           data: {
             stripePaymentId: (session.payment_intent as string) || session.id,
@@ -128,33 +168,36 @@ export async function POST(req: NextRequest) {
           }
         });
 
-        console.log("✅ Payment and user plan saved to database");
+        console.log("✅ Payment saved to database");
 
-        // ── Send WhatsApp success message ─────────────────────────────────
-        // Get phone from metadata first, fallback to searching message history
+        // Plan details
+        const planDetails: Record<string, { name: string; features: string }> = {
+          starter: { name: 'Starter', features: '500 emails/month, 5 concurrent jobs, Unlimited CSV export, Email support' },
+          plus: { name: 'Plus', features: 'Unlimited emails, 10 concurrent jobs, API access, Priority support, All platforms' },
+        }
+        const plan = planDetails[planType] || { name: planType, features: 'premium features' }
+        const renewDate = subscriptionEndDate
+          ? subscriptionEndDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+          : 'monthly'
+        const amount = (session.amount_total ?? 0) / 100
+
+        // Send payment success email
+        await sendPaymentSuccessEmail(userEmail, plan.name, plan.features, renewDate, amount)
+
+        // Find WhatsApp number
         let phoneNumber = whatsappPhone
         if (!phoneNumber) {
           phoneNumber = await findWhatsAppNumberByEmail(userEmail)
         }
 
-        console.log(`📱 Sending WhatsApp to: ${phoneNumber}`)
-
         if (phoneNumber) {
-          // Also update WhatsAppUser plan
+          // Update WhatsAppUser plan
           await prisma.whatsAppUser.updateMany({
             where: { phoneNumber },
             data: { plan: planType },
           }).catch(() => {})
 
-          const planDetails: Record<string, { name: string; features: string }> = {
-            starter: { name: 'Starter', features: '500 emails/month, 5 concurrent jobs, Unlimited CSV export' },
-            plus: { name: 'Plus', features: 'Unlimited emails, 10 concurrent jobs, API access, Priority support' },
-          }
-          const plan = planDetails[planType] || { name: planType, features: 'premium features' }
-          const renewDate = subscriptionEndDate
-            ? subscriptionEndDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-            : 'monthly'
-
+          // Send WhatsApp success message
           const successMessage = `🎉 *Payment Successful!*
 ━━━━━━━━━━━━━━━━━━━━
 ✅ Plan: *${plan.name}*
@@ -165,11 +208,13 @@ export async function POST(req: NextRequest) {
 🚀 *You now have access to:*
 ${plan.features}
 ━━━━━━━━━━━━━━━━━━━━
-Thank you for upgrading! Just send me a scraping request anytime and I'll get started right away. 😊`
+A confirmation has also been sent to your email! 📩
+
+Thank you for upgrading! Just send me a scraping request anytime. 😊`
 
           await sendWhatsAppMessage(phoneNumber, successMessage)
         } else {
-          console.log('⚠️ Could not find WhatsApp number for this user')
+          console.log('⚠️ Could not find WhatsApp number')
         }
 
       } catch (dbError) {
@@ -181,7 +226,6 @@ Thank you for upgrading! Just send me a scraping request anytime and I'll get st
 
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
-      console.log("❌ Subscription cancelled:", subscription.customer);
 
       try {
         const user = await prisma.user.findFirst({
@@ -203,8 +247,23 @@ Thank you for upgrading! Just send me a scraping request anytime and I'll get st
 
             await sendWhatsAppMessage(
               phoneNumber,
-              `ℹ️ Your ScrapeEngine subscription has been cancelled and your account has been moved back to the Free plan.\n\nYou still have access to 100 free companies. If you'd like to resubscribe, just say *"upgrade to Starter"* or *"upgrade to Plus"* anytime! 😊`
+              `ℹ️ Your ScrapeEngine subscription has been cancelled and your account is now on the Free plan.\n\nYou still have 100 free companies. To resubscribe, say *"upgrade to Starter"* or *"upgrade to Plus"* anytime! 😊`
             )
+
+            // Also send cancellation email
+            await resend.emails.send({
+              from: 'ScrapeEngine <onboarding@resend.dev>',
+              to: user.email,
+              subject: 'Your ScrapeEngine subscription has been cancelled',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+                  <h2>Subscription Cancelled</h2>
+                  <p>Your ScrapeEngine subscription has been cancelled. You've been moved back to the Free plan.</p>
+                  <p>You still have access to 100 free companies. You can resubscribe anytime from our pricing page.</p>
+                  <p>Thank you for being a ScrapeEngine customer!</p>
+                </div>
+              `,
+            }).catch(() => {})
           }
         }
 
